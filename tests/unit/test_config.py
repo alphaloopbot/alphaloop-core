@@ -3,7 +3,8 @@
 import os
 from unittest.mock import patch
 
-from alphaloop_core.config import settings
+from alphaloop_core.config import get_default_currency, settings
+from alphaloop_core.shared.types.enums import Currency
 
 
 class TestConfig:
@@ -66,3 +67,24 @@ class TestConfig:
 
         # Should be the same object due to caching
         assert config1 is config2
+
+    def test_default_currency_configuration(self) -> None:
+        """Test default currency configuration."""
+        settings.cache_clear()
+        # Test default value
+        currency = get_default_currency()
+        assert currency == Currency.USDT
+
+    def test_default_currency_override(self) -> None:
+        """Test default currency can be overridden."""
+        settings.cache_clear()
+        with patch.dict(os.environ, {"DEFAULT_CURRENCY": "BTC"}):
+            currency = get_default_currency()
+            assert currency == Currency.BTC
+
+    def test_default_currency_invalid_fallback(self) -> None:
+        """Test fallback to USDT for invalid currency."""
+        settings.cache_clear()
+        with patch.dict(os.environ, {"DEFAULT_CURRENCY": "INVALID"}):
+            currency = get_default_currency()
+            assert currency == Currency.USDT

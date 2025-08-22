@@ -27,6 +27,9 @@ dev: ## Install development dependencies and run full development cycle
 test: ## Run unit tests
 	poetry run pytest tests/unit/ -v
 
+test-conda: ## Test conda environment setup
+	python scripts/test_conda_env.py
+
 test-integration: ## Run integration tests (requires running services)
 	poetry run pytest tests/integration/ -v
 
@@ -37,7 +40,7 @@ lint: ## Run linting
 	poetry run ruff check .
 
 type-check: ## Run type checking with smart filtering
-	poetry run mypy src/alphaloop_core/ --ignore-missing-imports --disable-error-code=misc --disable-error-code=unused-ignore --disable-error-code=unreachable --disable-error-code=no-any-return --disable-error-code=dict-item --disable-error-code=attr-defined --disable-error-code=index --disable-error-code=var-annotated --disable-error-code=operator --disable-error-code=call-overload --disable-error-code=union-attr --disable-error-code=no-untyped-def
+	poetry run mypy src/alphaloop_core/ --ignore-missing-imports --disable-error-code=misc --disable-error-code=unused-ignore --disable-error-code=unreachable --disable-error-code=no-any-return --disable-error-code=dict-item --disable-error-code=attr-defined --disable-error-code=index --disable-error-code=var-annotated --disable-error-code=operator --disable-error-code=call-overload --disable-error-code=union-attr --disable-error-code=no-untyped-def --disable-error-code=safe-super
 
 format: ## Format code
 	poetry run ruff format .
@@ -50,36 +53,35 @@ clean: ## Clean up build artifacts
 	find . -type d -name ".pytest_cache" -exec rm -rf {} +
 	find . -type d -name ".mypy_cache" -exec rm -rf {} +
 
-start: ## Start all services
-	docker compose up -d
+start: ## Start all services (legacy - use services-start-local or services-start-cloud)
+	@echo "⚠️  Legacy docker-compose.yml removed. Use:"
+	@echo "   make services-start-local    # For local development"
+	@echo "   make services-start-cloud    # For cloud deployment"
 
-stop: ## Stop all services
-	docker compose down
+stop: ## Stop all services (legacy - use services-stop)
+	@echo "⚠️  Legacy docker-compose.yml removed. Use:"
+	@echo "   make services-stop"
 
-restart: stop start ## Restart all services
+restart: ## Restart all services (legacy - use services-stop then services-start-local/cloud)
+	@echo "⚠️  Legacy docker-compose.yml removed. Use:"
+	@echo "   make services-stop"
+	@echo "   make services-start-local    # or services-start-cloud"
 
-restart-no-cache: ## Restart all services with fresh Docker builds (no cache)
-	docker compose down
-	docker compose build --no-cache
-	docker compose up -d
+restart-no-cache: ## Restart all services with fresh Docker builds (legacy)
+	@echo "⚠️  Legacy docker-compose.yml removed. Use:"
+	@echo "   make services-build"
+	@echo "   make services-start-local    # or services-start-cloud"
 
 wait-for-services: ## Wait for services needed by integration tests
-	@echo "Waiting for services needed by integration tests..."
-	@echo "Waiting for Database..."
-	@t=120; until docker compose exec -T database pg_isready -U postgres > /dev/null 2>&1; do \
-	  sleep 1; t=$$((t-1)); if [ $$t -le 0 ]; then echo "Database not ready after 120s"; exit 1; fi; \
-	done
-	@echo "Waiting for API..."
-	@t=120; until curl -sf http://localhost:8000/health > /dev/null; do \
-	  sleep 1; t=$$((t-1)); if [ $$t -le 0 ]; then echo "API not ready after 120s"; exit 1; fi; \
-	done
-	@echo "Integration tests ready! ✨"
+	@echo "⚠️  Legacy docker-compose.yml removed. Use services in services/ directory"
 
-logs: ## Show logs from all services
-	docker compose logs -f
+logs: ## Show logs from all services (legacy - use services-logs)
+	@echo "⚠️  Legacy docker-compose.yml removed. Use:"
+	@echo "   make services-logs"
 
-status: ## Show service status
-	docker compose ps
+status: ## Show service status (legacy - use services-status)
+	@echo "⚠️  Legacy docker-compose.yml removed. Use:"
+	@echo "   make services-status"
 
 run-api: ## Run the API locally
 	poetry run uvicorn alphaloop_core.api:app --reload --host 0.0.0.0 --port 8000
@@ -136,3 +138,22 @@ export-and-analyze-pr-latest: ## Export and analyze latest PR review in one comm
 	@$(MAKE) analyze-pr-comments-latest PR=$(PR)
 	@echo "✅ Complete! Files ready in scripts/github-pr-tools/output/"
 	@echo "💡 Open scripts/github-pr-tools/output/pr_$(PR)_comments_latest_review_llm_prompt.txt in Cursor"
+
+# Service Management
+services-start-local: ## Start local development services
+	@cd services && ./scripts/start-local.sh
+
+services-start-cloud: ## Start cloud production services
+	@cd services && ./scripts/start-cloud.sh
+
+services-stop: ## Stop all services
+	@cd services && docker-compose down
+
+services-logs: ## Show service logs
+	@cd services && docker-compose logs -f
+
+services-status: ## Show service status
+	@cd services && docker-compose ps
+
+services-build: ## Build all service images
+	@cd services && docker-compose build

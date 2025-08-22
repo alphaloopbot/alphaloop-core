@@ -1,0 +1,36 @@
+[tool.poetry]
+name = "alphaloop-security"
+version = "0.1.0"
+description = "Security utilities for AlphaLoop Core - encryption, authentication, and secure URL handling"
+authors = ["Didac Cristobal-Canals <didac.crst@gmail.com>"]
+readme = "README.md"
+packages = [{include = "alphaloop_security", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+cryptography = "^41.0.0"
+pydantic = "^2.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.0.0"
+pytest-asyncio = "^0.21.0"
+ruff = "^0.1.0"
+mypy = "^1.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "B", "C4", "UP", "ARG", "SIM", "TCH", "TID", "Q"]
+ignore = ["E501", "B008", "C901", "B904"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true

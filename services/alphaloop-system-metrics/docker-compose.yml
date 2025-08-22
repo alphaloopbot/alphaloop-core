@@ -1,0 +1,28 @@
+services:
+  alphaloop-system-metrics:
+    container_name: alphaloop-system-metrics
+    restart: unless-stopped
+    image: alphaloop-system-metrics:latest
+    environment:
+      HOST_HOSTNAME: ${HOSTNAME}
+      DATABASE_URL: ${DATABASE_URL}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      METRICS_INTERVAL: ${METRICS_INTERVAL:-30}
+      SYSTEM_DATABASE: ${SYSTEM_DATABASE:-alphaloop_sys}
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - /dev:/dev:ro
+      - /proc:/proc:ro
+      - /sys:/sys:ro
+      - ${ALPHALOOP_HOME}/logs/:/app/logs/
+    depends_on:
+      alphaloop-database:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import psutil; print('OK')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

@@ -7,6 +7,8 @@ from types import MappingProxyType
 
 from dotenv import load_dotenv
 
+from alphaloop_core.shared.types.enums import Currency
+
 # Try to load .env from multiple possible locations
 env_paths = [
     Path(__file__).parent.parent.parent / ".env",  # From package root
@@ -52,5 +54,17 @@ def settings() -> MappingProxyType[str, str]:
             f"postgresql://{os.getenv('DB_USER','postgres')}:{os.getenv('DB_PASSWORD','password')}"
             f"@{os.getenv('DB_HOST','localhost')}:{os.getenv('DB_PORT','5432')}/{os.getenv('DB_NAME','alphaloop')}",
         ),
+        # Default currency for market data and trading operations
+        "DEFAULT_CURRENCY": os.getenv("DEFAULT_CURRENCY", "USDT"),
     }
     return MappingProxyType(cfg)
+
+
+def get_default_currency() -> Currency:
+    """Get the default currency from configuration."""
+    currency_str = settings()["DEFAULT_CURRENCY"]
+    try:
+        return Currency(currency_str)
+    except ValueError:
+        # Fallback to USDT if invalid currency is configured
+        return Currency.USDT

@@ -9,9 +9,10 @@ A comprehensive trading system built with Clean Architecture principles and mode
 - **Type Safety**: Full MyPy integration with smart filtering
 - **Code Quality**: Ruff for linting and formatting, pre-commit hooks
 - **Testing**: Comprehensive unit, integration, and e2e tests with pytest
-- **Docker**: Complete containerization with health checks
+- **Docker Services**: Modular service architecture with local/cloud deployment variants
 - **Development Tools**: Makefile workflows, GitHub PR analysis tools
-- **Configuration**: Centralized environment management
+- **Configuration**: Centralized environment management with configurable defaults
+- **Currency Support**: Configurable default currency (USDT) for market data and trading
 - **Reusable Packages**: Modular packages for heartbeat, logging, database, and data processing
 - **Exchange Integrations**: Support for multiple cryptocurrency exchanges
 - **Real-time Processing**: Async processing with message queues
@@ -26,7 +27,9 @@ A comprehensive trading system built with Clean Architecture principles and mode
 
 ## 🛠️ Quick Start
 
-### 1. Install Dependencies
+### Option 1: Using Poetry (Recommended)
+
+#### 1. Install Dependencies
 
 ```bash
 # Install Poetry if you haven't already
@@ -36,7 +39,40 @@ curl -sSL https://install.python-poetry.org | python3 -
 make install
 ```
 
-### 2. Set Up Development Environment
+### Option 2: Using Conda
+
+#### 1. Install Conda
+
+Download and install [Miniconda](https://docs.conda.io/en/latest/miniconda.html) or [Anaconda](https://www.anaconda.com/products/distribution).
+
+#### 2. Create Environment
+
+**On macOS/Linux:**
+```bash
+./scripts/setup_conda.sh
+```
+
+**On Windows:**
+```cmd
+scripts\setup_conda.bat
+```
+
+**Manual setup:**
+```bash
+# Create environment from yml file
+conda env create -f environment.yml
+
+# Activate environment
+conda activate alphaloop-core
+
+# Install project in development mode
+poetry install
+
+# Install pre-commit hooks
+pre-commit install
+```
+
+#### 2. Set Up Development Environment
 
 ```bash
 # Run the full development setup
@@ -50,24 +86,43 @@ This will:
 - Run type checking
 - Execute unit tests
 
-### 3. Start Services
+#### 3. Start Services
+
+##### Option A: Using Docker Services (Recommended)
 
 ```bash
-# Start all services (API + Database)
-make start
+# Start local development services (with cloud sync)
+make services-start-local
 
-# Wait for services to be ready
-make wait-for-services
+# Or start cloud production services
+make services-start-cloud
+
+# Check service status
+make services-status
+
+# View service logs
+make services-logs
 ```
 
-### 4. Run the API Locally
+##### Option B: Using Legacy Commands (Deprecated)
+
+```bash
+# ⚠️  Legacy docker-compose.yml has been removed
+# Use the new services structure instead:
+make services-start-local    # For local development
+make services-start-cloud    # For cloud deployment
+```
+
+#### 4. Run the API Locally
 
 ```bash
 # Run the API with hot reload
 make run-api
 ```
 
-The API will be available at `http://localhost:8000`
+The API will be available at:
+- **Local Development**: `http://localhost:8001`
+- **Cloud Production**: `http://localhost:8000`
 
 ## 📁 Project Structure
 
@@ -95,6 +150,7 @@ alphaloop-core/
 │       └── types/               # Custom types & enums
 ├── packages/                     # Reusable libraries
 │   ├── alphaloop-heartbeat/     # Health monitoring
+│   ├── alphaloop-security/      # Encryption & authentication
 │   ├── alphaloop-logging/       # Logging & reporting
 │   ├── alphaloop-database/      # Database abstractions
 │   └── alphaloop-data/          # Data processing utilities
@@ -196,6 +252,97 @@ Key configuration options:
 - `API_KEY`: Authentication key
 - `LOG_LEVEL`: Logging verbosity
 - `ENVIRONMENT`: Deployment environment
+- `DEFAULT_CURRENCY`: Default currency for market data and trading operations (default: USDT)
+
+### Currency Configuration
+
+The system supports configurable default currency for all market data and trading operations:
+
+```bash
+# Set default currency in environment
+export DEFAULT_CURRENCY=USDT  # Default value
+export DEFAULT_CURRENCY=BTC   # Alternative option
+export DEFAULT_CURRENCY=ETH   # Another option
+```
+
+Supported currencies: `USD`, `EUR`, `BTC`, `ETH`, `USDT`, `USDC`
+
+The default currency is used when creating `MarketData` entities unless explicitly specified. This ensures consistent currency handling throughout the system while allowing flexibility when needed.
+
+## 🏗️ Services Architecture
+
+The project uses a modular Docker service architecture:
+
+### 🗄️ Database Service (`alphaloop-database`)
+- **PostgreSQL 16.4** with separate databases for system and market data
+- **Health checks** and persistent storage
+- **User management** with separate permissions
+
+### 📊 System Metrics Service (`alphaloop-system-metrics`)
+- **System monitoring** (CPU, memory, disk usage)
+- **Hardware information** collection
+- **Performance metrics** aggregation
+
+### 📈 Market Data Service (`alphaloop-market-data`)
+- **Local deployment**: Includes central infrastructure data synchronization for missing data
+- **Central deployment**: Primary data collection only
+- **Real-time processing** with configurable intervals
+
+For detailed service documentation, see [Services README](services/README.md).
+
+## 🏗️ System Overview
+
+```mermaid
+graph TB
+    subgraph "Data Sources"
+        EX[Exchanges<br/>Binance, Coinbase, Kraken]
+    end
+
+    subgraph "Central Infrastructure"
+        CMD[Central Market Data<br/>Service]
+        CDB[(Central Database<br/>Market Prices)]
+        CAPI[Central API<br/>Missing Data Service]
+    end
+
+    subgraph "Local Nodes"
+        subgraph "Local Instance 1"
+            L1_MD[Local 1 Market Data]
+            L1_DB[(Local 1 Database<br/>Market Prices, Aggregates)]
+        end
+
+        subgraph "Local Instance 2"
+            L2_MD[Local 2 Market Data]
+            L2_DB[(Local 2 Database<br/>Market Prices, Aggregates)]
+        end
+    end
+
+    %% Data flows from exchanges
+    EX --> CMD
+    EX --> L1_MD
+    EX --> L2_MD
+
+    %% Central internal connections
+    CMD --> CDB
+    CAPI --> CDB
+
+    %% Local internal connections
+    L1_MD --> L1_DB
+    L2_MD --> L2_DB
+
+    %% Central API provides missing data to local instances
+    CAPI -.->|Missing Time Series| L1_MD
+    CAPI -.->|Missing Time Series| L2_MD
+
+    classDef external fill:#ff9999
+    classDef central fill:#99ccff
+    classDef local fill:#ffcc99
+
+    class EX external
+    class CMD,CDB,CAPI central
+    class L1_MD,L1_DB,L2_MD,L2_DB local
+```
+
+For comprehensive architecture diagrams, see [System Architecture Diagrams](docs/architecture/diagrams/system-overview.md).
 
 ## 🧪 Testing
 
@@ -270,6 +417,7 @@ The project uses pre-commit hooks for code quality:
 
 ### Core Documents
 - [**Architecture Overview**](docs/architecture/overview.md) - System architecture and design decisions
+- [**System Architecture Diagrams**](docs/architecture/diagrams/system-overview.md) - Visual system architecture and data flows
 - [**Coding Standards & Axioms**](docs/development/coding-standards.md) - Core principles and axioms
 - [**Axioms Reference Card**](docs/development/axioms-reference.md) - Quick reference for daily development
 - [**Architecture Decision Records**](docs/architecture/decisions/) - ADRs for architectural decisions

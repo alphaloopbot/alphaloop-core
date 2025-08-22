@@ -187,3 +187,5 @@ output/
 .env.local
 .env.production
 
+# Legacy code (should not be committed)
+legacy/

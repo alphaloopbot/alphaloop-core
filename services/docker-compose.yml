@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  # Database Service
+  alphaloop-database:
+    extends:
+      file: ./alphaloop-database/docker-compose.yml
+      service: alphaloop-database
+
+  # System Metrics Service
+  alphaloop-system-metrics:
+    extends:
+      file: ./alphaloop-system-metrics/docker-compose.yml
+      service: alphaloop-system-metrics
+
+  # Market Data Service (Local deployment with cloud sync)
+  alphaloop-market-data-local:
+    extends:
+      file: ./alphaloop-market-data/docker-compose.local.yml
+      service: alphaloop-market-data-local
+
+  # Market Data Service (Cloud deployment without sync)
+  alphaloop-market-data-cloud:
+    extends:
+      file: ./alphaloop-market-data/docker-compose.cloud.yml
+      service: alphaloop-market-data-cloud
+
+networks:
+  default:
+    name: alphaloop-network

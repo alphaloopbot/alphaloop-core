@@ -76,10 +76,14 @@ class Entity(ABC):
         """Validate the entity state."""
         pass
 
-    @abstractmethod
     def to_dict(self) -> dict[str, Any]:
         """Convert entity to dictionary representation."""
-        pass
+        return {
+            "id": str(self._id),
+            "created_at": self._created_at.isoformat(),
+            "updated_at": self._updated_at.isoformat(),
+            "status": self._status.value,
+        }
 
     def __eq__(self, other: Any) -> bool:
         """Check equality based on ID."""
