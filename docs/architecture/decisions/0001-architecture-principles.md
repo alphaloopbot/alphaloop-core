@@ -12,12 +12,12 @@ We will follow these core architectural axioms:
 ### 🏗️ **Clean Architecture Axioms**
 
 #### A1: **Dependency Rule**
-- **Axiom**: Dependencies must point inward (Infrastructure → Application → Domain).
-- **Violation**: If an inner layer depends on an outer layer, it's wrong.
+- **Axiom**: Dependencies point inward (outer → inner). Outer layers may depend on inner layers; inner layers must never depend on outer layers.
+- **Violation**: Any inner layer (Domain/Application) depending on an outer layer (Application/Infrastructure) is a violation.
 - **Examples**:
   - Domain importing SQLAlchemy (infrastructure) = ❌
-  - Application depending on a concrete DB driver instead of an interface = ❌
-  - Infrastructure importing Domain entities and interfaces = ✅
+  - Application depending on a concrete DB driver instead of an interface/port = ❌
+  - Infrastructure depending on Domain entities and implementing Application/Domain-defined ports (interfaces) = ✅
 
 #### A2: **Domain Independence**
 - **Axiom**: Domain layer must be completely independent of external concerns
@@ -92,10 +92,13 @@ We will follow these core architectural axioms:
 - **Violation**: If code bypasses repositories for data access, it's wrong
 - **Example**: Use case directly querying database = ❌
 
-#### A13: **Event-Driven Communication**
-- **Axiom**: Cross-boundary communication must use domain events
-- **Violation**: If modules directly call each other across boundaries, it's wrong
-- **Example**: Infrastructure directly calling application methods = ❌
+#### A13: **Boundary Communication via Ports; Events for Async Decoupling**
+- **Axiom**: Cross-boundary interactions go through ports (interfaces). Prefer synchronous calls via ports for request/response; use domain events for asynchronous, decoupled workflows.
+- **Violation**: Bypassing ports (e.g., concrete cross-layer calls) or coupling to implementation details is a violation.
+- **Examples**:
+  - Web adapter calling an Application use case via its input port = ✅
+  - Use case publishing a domain event for downstream processing = ✅
+  - Infrastructure calling an Application concrete class directly (no port) = ❌
 
 ### 🧪 **Testing Axioms**
 

@@ -35,25 +35,30 @@ class HeartbeatGenerator:
 
     async def generate_heartbeat(self) -> None:
         """Generate a heartbeat file for the service."""
-        try:
-            heartbeat_data = {
-                "service_name": self.service_name,
-                "timestamp": get_current_timestamp(),
-                "status": "healthy",
-                "version": self.version,
-            }
+        import os
+        from pathlib import Path
 
-            heartbeat_file = get_heartbeat_file_path(self.service_name)
-            heartbeat_file.parent.mkdir(parents=True, exist_ok=True)
+        heartbeat_data = {
+            "service_name": self.service_name,
+            "timestamp": get_current_timestamp(),
+            "status": "healthy",
+            "version": self.version,
+        }
 
-            with open(heartbeat_file, "w") as f:
-                json.dump(heartbeat_data, f, indent=2)
+        heartbeat_file = get_heartbeat_file_path(
+            self.service_name, Path(self.settings.heartbeat_directory)
+        )
+        heartbeat_file.parent.mkdir(parents=True, exist_ok=True)
 
-            logger.debug(f"Heartbeat generated for {self.service_name}")
+        # Atomic write: write to tmp and replace
+        tmp_file = heartbeat_file.with_suffix(heartbeat_file.suffix + ".tmp")
+        with open(tmp_file, "w", encoding="utf-8") as f:
+            json.dump(heartbeat_data, f, indent=2)
+            f.flush()
+            os.fsync(f.fileno())
+        os.replace(tmp_file, heartbeat_file)
 
-        except Exception as e:
-            logger.error(f"Failed to generate heartbeat for {self.service_name}: {e}")
-            raise
+        logger.debug("Heartbeat generated for %s", self.service_name)
 
     async def start_generating(self) -> None:
         """Start generating heartbeats at regular intervals."""

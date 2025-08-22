@@ -124,9 +124,11 @@ class DatabaseConnectionManager:
                         "postgresql+asyncpg://", "postgresql://"
                     ).replace("postgresql+psycopg://", "postgresql://")
 
+                # Clamp min_size so it's at most max_size and at least 1
+                min_size = max(1, min(5, self._pool_size))
                 self._pool = await asyncpg.create_pool(
                     db_url,
-                    min_size=5,
+                    min_size=min_size,
                     max_size=self._pool_size,
                     command_timeout=self._pool_timeout,
                 )
@@ -141,11 +143,20 @@ class DatabaseConnectionManager:
         self,
     ) -> AsyncGenerator[asyncpg.Connection, None]:
         """Get a raw connection with automatic cleanup."""
-        conn = await self.get_raw_connection()
+        # Capture pool reference to avoid race with close()
+        if self._pool is None:
+            await self._initialize_raw_pool()
+        pool = self._pool
+        if pool is None:
+            raise DatabaseConnectionError("Database pool not initialized")
+        conn = await pool.acquire()
         try:
             yield conn
         finally:
-            await self._pool.release(conn)
+            try:
+                await pool.release(conn)
+            except Exception as e:
+                logger.warning("Failed to release raw connection back to pool: %s", e)
 
     async def close(self) -> None:
         """Close all database connections."""
