@@ -1,4 +1,4 @@
-.PHONY: help install dev test test-integration integration lint type-check format clean start stop logs restart restart-no-cache wait-for-services status github-pr-export github-pr-analyze github-pr-latest
+.PHONY: help install dev test test-integration integration lint type-check format clean start stop logs restart restart-no-cache wait-for-services status export-pr-comments analyze-pr-comments analyze-pr-comments-latest export-and-analyze-pr export-and-analyze-pr-latest
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -84,31 +84,51 @@ run-cli: ## Run the CLI
 	poetry run alphaloop-cli --help
 
 # GitHub PR Tools
-github-pr-export: ## Export GitHub PR comments (usage: make github-pr-export PR=123)
+export-pr-comments: ## Export GitHub PR comments to JSON (requires PR=<number>)
 	@if [ -z "$(PR)" ]; then \
-		echo "Error: PR is required. Usage: make github-pr-export PR=123"; \
+		echo "Error: PR number required. Usage: make export-pr-comments PR=123"; \
 		exit 1; \
 	fi
-	@echo "Exporting comments for PR #$(PR)..."
-	@mkdir -p scripts/github-pr-tools/output
+	@echo "Exporting PR #$(PR) comments..."
+	@chmod +x scripts/github-pr-tools/export_github_pr_comments.sh
 	@./scripts/github-pr-tools/export_github_pr_comments.sh $(PR)
-	@echo "Comments exported to scripts/github-pr-tools/output/pr_$(PR)_comments.json"
+	@echo "✅ Comments exported to scripts/github-pr-tools/output/pr_$(PR)_comments.json"
+	@echo "💡 You can now feed this JSON to an LLM for analysis"
 
-github-pr-analyze: ## Analyze GitHub PR comments (usage: make github-pr-analyze PR=123)
+analyze-pr-comments: ## Analyze PR comments and generate LLM prompt (requires PR=<number>)
 	@if [ -z "$(PR)" ]; then \
-		echo "Error: PR is required. Usage: make github-pr-analyze PR=123"; \
+		echo "Error: PR number required. Usage: make analyze-pr-comments PR=123"; \
 		exit 1; \
 	fi
-	@echo "Analyzing comments for PR #$(PR)..."
+	@echo "Analyzing PR #$(PR) comments..."
 	@python scripts/github-pr-tools/analyze_pr_comments.py scripts/github-pr-tools/output/pr_$(PR)_comments.json
-	@echo "Analysis complete! Check the output above for insights."
 
-github-pr-latest: ## Export and analyze the latest PR comments (usage: make github-pr-latest PR=123)
+analyze-pr-comments-latest: ## Analyze only the latest PR review (requires PR=<number>)
 	@if [ -z "$(PR)" ]; then \
-		echo "Error: PR is required. Usage: make github-pr-latest PR=123"; \
+		echo "Error: PR number required. Usage: make analyze-pr-comments-latest PR=123"; \
 		exit 1; \
 	fi
-	@echo "Processing latest comments for PR #$(PR)..."
-	@$(MAKE) github-pr-export PR=$(PR)
-	@$(MAKE) github-pr-analyze PR=$(PR)
-	@echo "Complete analysis finished! ✨"
+	@echo "Analyzing latest review for PR #$(PR)..."
+	@python scripts/github-pr-tools/analyze_pr_comments.py scripts/github-pr-tools/output/pr_$(PR)_comments.json --latest-only
+
+export-and-analyze-pr: ## Export and analyze PR comments in one command (requires PR=<number>)
+	@if [ -z "$(PR)" ]; then \
+		echo "Error: PR number required. Usage: make export-and-analyze-pr PR=123"; \
+		exit 1; \
+	fi
+	@echo "🚀 Exporting and analyzing PR #$(PR) comments..."
+	@$(MAKE) export-pr-comments PR=$(PR)
+	@$(MAKE) analyze-pr-comments PR=$(PR)
+	@echo "✅ Complete! Files ready in scripts/github-pr-tools/output/"
+	@echo "💡 Open scripts/github-pr-tools/output/pr_$(PR)_comments_llm_prompt.txt in Cursor"
+
+export-and-analyze-pr-latest: ## Export and analyze latest PR review in one command (requires PR=<number>)
+	@if [ -z "$(PR)" ]; then \
+		echo "Error: PR number required. Usage: make export-and-analyze-pr-latest PR=123"; \
+		exit 1; \
+	fi
+	@echo "🚀 Exporting and analyzing latest review for PR #$(PR)..."
+	@$(MAKE) export-pr-comments PR=$(PR)
+	@$(MAKE) analyze-pr-comments-latest PR=$(PR)
+	@echo "✅ Complete! Files ready in scripts/github-pr-tools/output/"
+	@echo "💡 Open scripts/github-pr-tools/output/pr_$(PR)_comments_latest_review_llm_prompt.txt in Cursor"
