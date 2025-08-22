@@ -19,7 +19,16 @@ if [ -f "$(dirname "$0")/.env" ]; then
 fi
 
 if [ -z "${GITHUB_TOKEN:-}" ]; then
-    echo "Error: GITHUB_TOKEN not set. Put it in scripts/github-pr-tools/.env or export it."
+    echo "Error: GITHUB_TOKEN not set."
+    echo ""
+    echo "Setup instructions:"
+    echo "1. Copy the example file: cp scripts/github-pr-tools/env.example scripts/github-pr-tools/.env"
+    echo "2. Edit scripts/github-pr-tools/.env and add your GitHub token"
+    echo "3. Or export GITHUB_TOKEN environment variable"
+    echo ""
+    echo "To get a GitHub token:"
+    echo "- Go to GitHub.com → Settings → Developer settings → Personal access tokens"
+    echo "- Generate new token with 'repo' or 'public_repo' scope"
     exit 1
 fi
 
