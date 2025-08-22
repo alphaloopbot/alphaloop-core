@@ -151,7 +151,7 @@ alphaloop-core/
 ├── packages/                     # Reusable libraries
 │   ├── alphaloop-heartbeat/     # Health monitoring
 │   ├── alphaloop-security/      # Encryption & authentication
-│   ├── alphaloop-logging/       # Logging & reporting
+│   ├── alphaloop-logging/       # Advanced logging with Telegram
 │   ├── alphaloop-database/      # Database abstractions
 │   └── alphaloop-data/          # Data processing utilities
 ├── docker/                       # Docker configurations

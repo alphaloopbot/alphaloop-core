@@ -20,6 +20,9 @@ psutil = "^5.9"
 aiofiles = "^24.0"
 pyyaml = "^6.0.1"
 cryptography = "^41.0.0"
+aiohttp = "^3.9.0"
+structlog = "^23.2.0"
+rich = "^13.7.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2"
@@ -97,6 +100,7 @@ warn_no_return = true
 warn_unreachable = false
 strict_equality = true
 disable_error_code = ["import-not-found", "misc", "unused-ignore", "unreachable", "no-any-return", "dict-item"]
+exclude = ["packages/alphaloop-logging/"]
 
 [[tool.mypy.overrides]]
 module = [
