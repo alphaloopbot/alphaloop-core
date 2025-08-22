@@ -89,8 +89,6 @@ class SecureURLComposer:
         """
         try:
             encrypted_data, hash_value = self.data_encryptor.encrypt(json.dumps(data))
-            if not self.is_valid_base64(encrypted_data):
-                raise EncryptionError("Invalid Base64 encoding after encryption.")
             return encrypted_data, hash_value
         except Exception as e:
             raise EncryptionError(f"Parameter encryption failed: {str(e)}")

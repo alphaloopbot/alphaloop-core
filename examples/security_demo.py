@@ -140,7 +140,7 @@ def demo_secure_urls():
         decrypted_params = reader(encrypted_data, hash_value)
         print(f"Decrypted parameters: {decrypted_params}")
 
-        # Verify
+        # Verify (note: decrypted_params will have an extra 'unicode' field)
         if parameters["user_id"] == decrypted_params["user_id"]:
             print("✅ Secure URL processing successful")
         else:

@@ -161,6 +161,8 @@ class DataEncryptor:
         Returns:
             True if the data is valid Base64, False otherwise.
         """
+        if not data:
+            return False
         try:
             base64.urlsafe_b64decode(data)
             return True

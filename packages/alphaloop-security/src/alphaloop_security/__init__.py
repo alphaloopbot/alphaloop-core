@@ -9,7 +9,12 @@ __email__ = "didac.crst@gmail.com"
 
 from .auth import ConnectionAuthenticator
 from .encryption import DataEncryptor
-from .exceptions import SecurityError, UnauthorizedRequestError
+from .exceptions import (
+    EncryptionError,
+    IntegrityError,
+    SecurityError,
+    UnauthorizedRequestError,
+)
 from .integrity import DictionaryIntegrityValidator
 from .secure_url import SecureURLComposer, SecureURLReader
 
@@ -21,4 +26,6 @@ __all__ = [
     "DictionaryIntegrityValidator",
     "SecurityError",
     "UnauthorizedRequestError",
+    "EncryptionError",
+    "IntegrityError",
 ]
