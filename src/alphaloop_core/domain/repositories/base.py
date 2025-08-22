@@ -1,7 +1,7 @@
 """Abstract base interface for all repositories."""
 
 from abc import ABC, abstractmethod
-from typing import Any, Generic, TypeVar
+from typing import Any, TypeVar
 from uuid import UUID
 
 from ..entities.base import Entity
@@ -9,7 +9,7 @@ from ..entities.base import Entity
 T = TypeVar("T", bound=Entity)
 
 
-class Repository(ABC, Generic[T]):
+class Repository[T](ABC):
     """Abstract base interface for all repositories with common CRUD operations."""
 
     @abstractmethod
@@ -58,7 +58,7 @@ class Repository(ABC, Generic[T]):
         pass
 
 
-class ReadOnlyRepository(ABC, Generic[T]):
+class ReadOnlyRepository[T](ABC):
     """Abstract base interface for read-only repositories."""
 
     @abstractmethod
