@@ -28,13 +28,13 @@ cp scripts/github-pr-tools/env.example scripts/github-pr-tools/.env
 
 ```bash
 # Export comments from PR #123
-make github-pr-export PR_NUMBER=123
+make github-pr-export PR=123
 
 # Analyze the exported comments
-make github-pr-analyze PR_NUMBER=123
+make github-pr-analyze PR=123
 
 # Export and analyze in one command
-make github-pr-latest PR_NUMBER=123
+make github-pr-latest PR=123
 ```
 
 ## 📁 File Structure
@@ -54,7 +54,7 @@ scripts/github-pr-tools/
 
 ### Export Comments
 ```bash
-make github-pr-export PR_NUMBER=123
+make github-pr-export PR=123
 ```
 - Exports all comments from PR #123
 - Saves to `output/pr_123_comments.json`
@@ -62,7 +62,7 @@ make github-pr-export PR_NUMBER=123
 
 ### Analyze Comments
 ```bash
-make github-pr-analyze PR_NUMBER=123
+make github-pr-analyze PR=123
 ```
 - Analyzes the exported comments
 - Shows metrics and insights
@@ -70,7 +70,7 @@ make github-pr-analyze PR_NUMBER=123
 
 ### Export and Analyze
 ```bash
-make github-pr-latest PR_NUMBER=123
+make github-pr-latest PR=123
 ```
 - Combines both operations
 - Perfect for quick analysis
@@ -113,7 +113,7 @@ cp scripts/github-pr-tools/env.example scripts/github-pr-tools/.env
 
 ```bash
 # After CodeRabbit reviews your PR #456
-make github-pr-latest PR_NUMBER=456
+make github-pr-latest PR=456
 
 # This will:
 # 1. Export all CodeRabbit comments

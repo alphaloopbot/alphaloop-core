@@ -38,7 +38,7 @@ curl -sSf \
     -H "Accept: application/vnd.github+json" \
     -H "X-GitHub-Api-Version: 2022-11-28" \
     -H "Authorization: Bearer $GITHUB_TOKEN" \
-    "https://api.github.com/repos/your-username/alphaloop-core/pulls/$PR_NUMBER/comments?per_page=100" \
+    "https://api.github.com/repos/didac-crst/alphaloop-core/pulls/$PR_NUMBER/comments?per_page=100" \
     > "$OUTPUT_FILE"
 
 echo "✅ Comments exported to $OUTPUT_FILE"

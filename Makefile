@@ -84,31 +84,31 @@ run-cli: ## Run the CLI
 	poetry run alphaloop-cli --help
 
 # GitHub PR Tools
-github-pr-export: ## Export GitHub PR comments (usage: make github-pr-export PR_NUMBER=123)
-	@if [ -z "$(PR_NUMBER)" ]; then \
-		echo "Error: PR_NUMBER is required. Usage: make github-pr-export PR_NUMBER=123"; \
+github-pr-export: ## Export GitHub PR comments (usage: make github-pr-export PR=123)
+	@if [ -z "$(PR)" ]; then \
+		echo "Error: PR is required. Usage: make github-pr-export PR=123"; \
 		exit 1; \
 	fi
-	@echo "Exporting comments for PR #$(PR_NUMBER)..."
+	@echo "Exporting comments for PR #$(PR)..."
 	@mkdir -p scripts/github-pr-tools/output
-	@./scripts/github-pr-tools/export_github_pr_comments.sh $(PR_NUMBER)
-	@echo "Comments exported to scripts/github-pr-tools/output/pr_$(PR_NUMBER)_comments.json"
+	@./scripts/github-pr-tools/export_github_pr_comments.sh $(PR)
+	@echo "Comments exported to scripts/github-pr-tools/output/pr_$(PR)_comments.json"
 
-github-pr-analyze: ## Analyze GitHub PR comments (usage: make github-pr-analyze PR_NUMBER=123)
-	@if [ -z "$(PR_NUMBER)" ]; then \
-		echo "Error: PR_NUMBER is required. Usage: make github-pr-analyze PR_NUMBER=123"; \
+github-pr-analyze: ## Analyze GitHub PR comments (usage: make github-pr-analyze PR=123)
+	@if [ -z "$(PR)" ]; then \
+		echo "Error: PR is required. Usage: make github-pr-analyze PR=123"; \
 		exit 1; \
 	fi
-	@echo "Analyzing comments for PR #$(PR_NUMBER)..."
-	@python scripts/github-pr-tools/analyze_pr_comments.py scripts/github-pr-tools/output/pr_$(PR_NUMBER)_comments.json
+	@echo "Analyzing comments for PR #$(PR)..."
+	@python scripts/github-pr-tools/analyze_pr_comments.py scripts/github-pr-tools/output/pr_$(PR)_comments.json
 	@echo "Analysis complete! Check the output above for insights."
 
-github-pr-latest: ## Export and analyze the latest PR comments (usage: make github-pr-latest PR_NUMBER=123)
-	@if [ -z "$(PR_NUMBER)" ]; then \
-		echo "Error: PR_NUMBER is required. Usage: make github-pr-latest PR_NUMBER=123"; \
+github-pr-latest: ## Export and analyze the latest PR comments (usage: make github-pr-latest PR=123)
+	@if [ -z "$(PR)" ]; then \
+		echo "Error: PR is required. Usage: make github-pr-latest PR=123"; \
 		exit 1; \
 	fi
-	@echo "Processing latest comments for PR #$(PR_NUMBER)..."
-	@$(MAKE) github-pr-export PR_NUMBER=$(PR_NUMBER)
-	@$(MAKE) github-pr-analyze PR_NUMBER=$(PR_NUMBER)
+	@echo "Processing latest comments for PR #$(PR)..."
+	@$(MAKE) github-pr-export PR=$(PR)
+	@$(MAKE) github-pr-analyze PR=$(PR)
 	@echo "Complete analysis finished! ✨"
