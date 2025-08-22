@@ -45,7 +45,9 @@ class HeartbeatGenerator:
             if interval is not None
             else getattr(self.settings, "default_interval_seconds", 60)
         )
-        self.version = version or "1.0.0"
+        if self._interval <= 0:
+            raise ValueError("interval must be > 0 seconds")
+        self.version = version or "1.0.0"  # TODO: Replace with PACKAGE_VERSION when available
 
     async def generate_heartbeat(self) -> None:
         """Generate a heartbeat file for the service."""
@@ -104,7 +106,10 @@ async def main() -> None:
     parser = argparse.ArgumentParser(description="Generate heartbeats for service monitoring")
     parser.add_argument("service_name", help="Name of the service to monitor")
     parser.add_argument(
-        "--interval", type=int, default=30, help="Heartbeat interval in seconds (default: 30)"
+        "--interval",
+        type=int,
+        default=30,
+        help="Heartbeat interval in seconds (default: 30)",
     )
     parser.add_argument("--version", default="1.0.0", help="Service version (default: 1.0.0)")
 
