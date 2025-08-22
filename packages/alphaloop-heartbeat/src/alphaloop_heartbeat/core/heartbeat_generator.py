@@ -10,6 +10,9 @@ from alphaloop_heartbeat.config.settings import HeartbeatSettings
 from alphaloop_heartbeat.utils.file_utils import get_heartbeat_file_path
 from alphaloop_heartbeat.utils.time_utils import get_current_timestamp
 
+# Package version from pyproject.toml
+PACKAGE_VERSION = "0.1.0"
+
 
 def _sanitize_service_name(name: str) -> str:
     """Sanitize user-supplied service names to safe filenames."""
@@ -47,7 +50,7 @@ class HeartbeatGenerator:
         )
         if self._interval <= 0:
             raise ValueError("interval must be > 0 seconds")
-        self.version = version or "1.0.0"  # TODO: Replace with PACKAGE_VERSION when available
+        self.version = version or PACKAGE_VERSION
 
     async def generate_heartbeat(self) -> None:
         """Generate a heartbeat file for the service."""
