@@ -3,10 +3,24 @@
 import asyncio
 import json
 import logging
+import os
+import re
 
 from alphaloop_heartbeat.config.settings import HeartbeatSettings
 from alphaloop_heartbeat.utils.file_utils import get_heartbeat_file_path
 from alphaloop_heartbeat.utils.time_utils import get_current_timestamp
+
+
+def _sanitize_service_name(name: str) -> str:
+    """Sanitize user-supplied service names to safe filenames."""
+    base = os.path.basename(name.strip())
+    if base in {"", ".", ".."}:
+        raise ValueError("Invalid service_name")
+    # Allow alnum, underscore, dash, dot; collapse any pathy/dotty patterns
+    base = re.sub(r"[^A-Za-z0-9_.-]+", "_", base)
+    base = re.sub(r"\.\.+", "_", base)
+    return base
+
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +36,7 @@ class HeartbeatGenerator:
         version: str | None = None,
     ) -> None:
         """Initialize the heartbeat generator."""
-        self.service_name = service_name
+        self.service_name = _sanitize_service_name(service_name)
         self.settings = settings or HeartbeatSettings()
         self._running = False
         # Runtime configuration derived from settings or explicit overrides

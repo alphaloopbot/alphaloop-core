@@ -138,7 +138,7 @@ Every PR must be checked against these axioms:
 - [ ] Dependencies properly injected (A8, A9)
 - [ ] Exception hierarchy followed (A10, A11)
 - [ ] Repository pattern used (A12)
-- [ ] Events used for cross-boundary communication (A13)
+- [ ] Cross-boundary calls go through ports; use events where async decoupling is desired (A13)
 - [ ] Tests are independent (A14)
 - [ ] Domain logic is tested (A15)
 

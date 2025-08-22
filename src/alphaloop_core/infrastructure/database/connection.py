@@ -47,9 +47,10 @@ class DatabaseConnectionManager:
             if self._engine is not None:
                 return
 
+            new_engine = None
             try:
-                # Create SQLAlchemy async engine
-                self._engine = create_async_engine(
+                # Create SQLAlchemy async engine (provisional)
+                new_engine = create_async_engine(
                     self._database_url,
                     pool_size=self._pool_size,
                     max_overflow=self._max_overflow,
@@ -58,22 +59,27 @@ class DatabaseConnectionManager:
                     echo=self._echo,
                     pool_pre_ping=True,
                 )
-
-                # Create session factory
-                self._session_factory = async_sessionmaker(
-                    bind=self._engine,
+                # Create session factory (provisional)
+                new_session_factory = async_sessionmaker(
+                    bind=new_engine,
                     class_=AsyncSession,
                     expire_on_commit=False,
                 )
-
-                # Test the connection
-                async with self._engine.begin() as conn:
+                # Validate connectivity before publishing state
+                async with new_engine.begin() as conn:
                     await conn.execute(text("SELECT 1"))
-
             except Exception as e:
+                if new_engine is not None:
+                    try:
+                        await new_engine.dispose()
+                    except Exception:
+                        pass
                 raise DatabaseConnectionError(
                     f"Failed to initialize database connection: {str(e)}"
                 ) from e
+            else:
+                self._engine = new_engine
+                self._session_factory = new_session_factory
 
     async def get_session(self) -> AsyncSession:
         """Get a database session."""
@@ -124,12 +130,13 @@ class DatabaseConnectionManager:
                         "postgresql+asyncpg://", "postgresql://"
                     ).replace("postgresql+psycopg://", "postgresql://")
 
-                # Clamp min_size so it's at most max_size and at least 1
-                min_size = max(1, min(5, self._pool_size))
+                # Clamp pool sizes: 1 <= min_size <= max_size
+                max_size = max(1, int(self._pool_size))
+                min_size = max(1, min(5, max_size))
                 self._pool = await asyncpg.create_pool(
                     db_url,
                     min_size=min_size,
-                    max_size=self._pool_size,
+                    max_size=max_size,
                     command_timeout=self._pool_timeout,
                 )
 
@@ -210,14 +217,18 @@ class DatabaseConnectionManager:
 
 # Global database connection manager instance
 _db_manager: DatabaseConnectionManager | None = None
+_manager_lock = asyncio.Lock()
 
 
 async def get_database_manager() -> DatabaseConnectionManager:
     """Get the global database connection manager instance."""
     global _db_manager
     if _db_manager is None:
-        _db_manager = DatabaseConnectionManager()
-        await _db_manager.initialize()
+        async with _manager_lock:
+            if _db_manager is None:
+                manager = DatabaseConnectionManager()
+                await manager.initialize()
+                _db_manager = manager
     return _db_manager
 
 
