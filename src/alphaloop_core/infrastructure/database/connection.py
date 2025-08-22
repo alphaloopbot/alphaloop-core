@@ -1,14 +1,19 @@
 """Database connection management and pooling."""
 
 import asyncio
+import logging
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 import asyncpg
+from sqlalchemy import text
+from sqlalchemy.engine.url import make_url
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from ...shared.exceptions.infrastructure_exceptions import DatabaseConnectionError
 from ...shared.utils.config import get_database_url
+
+logger = logging.getLogger(__name__)
 
 
 class DatabaseConnectionManager:
@@ -63,7 +68,7 @@ class DatabaseConnectionManager:
 
                 # Test the connection
                 async with self._engine.begin() as conn:
-                    await conn.execute("SELECT 1")
+                    await conn.execute(text("SELECT 1"))
 
             except Exception as e:
                 raise DatabaseConnectionError(
@@ -151,19 +156,20 @@ class DatabaseConnectionManager:
         """Perform a health check on the database connection."""
         try:
             async with self.get_session_context() as session:
-                await session.execute("SELECT 1")
+                await session.execute(text("SELECT 1"))
             return True
         except Exception:
             return False
 
     async def get_connection_info(self) -> dict:
         """Get information about the database connection."""
+        masked_url = "***"
+        try:
+            masked_url = make_url(self._database_url).render_as_string(hide_password=True)
+        except Exception:
+            pass
         return {
-            "database_url": (
-                self._database_url.replace("://", "://***:***@")
-                if "://" in self._database_url
-                else "***"
-            ),
+            "database_url": masked_url,
             "pool_size": self._pool_size,
             "max_overflow": self._max_overflow,
             "pool_timeout": self._pool_timeout,

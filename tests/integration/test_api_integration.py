@@ -4,8 +4,7 @@ from collections.abc import Generator
 
 import httpx
 import pytest
-
-from src.alphaloop_core.config import settings
+from alphaloop_core.config import settings
 
 
 @pytest.fixture

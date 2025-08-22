@@ -1,7 +1,7 @@
 """Base exception class for shared exceptions."""
 
 
-class BaseException(Exception):
+class AlphaLoopError(Exception):
     """Base exception class with common functionality."""
 
     def __init__(self, message: str, code: str | None = None) -> None:
@@ -16,4 +16,4 @@ class BaseException(Exception):
 
     def __repr__(self) -> str:
         """String representation for debugging."""
-        return f"{self.__class__.__name__}(message='{self.message}', code='{self.code}')"
+        return f"{self.__class__.__name__}(message={self.message!r}, code={self.code!r})"

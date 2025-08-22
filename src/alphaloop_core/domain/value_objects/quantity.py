@@ -63,10 +63,14 @@ class Quantity:
         """Multiply Quantity by a scalar."""
         if not isinstance(multiplier, int | float | Decimal):
             raise TypeError("Multiplier must be a number")
-        return Quantity(self._value * Decimal(str(multiplier)), self._precision)
+
+        # Convert to Decimal for precise arithmetic
+        multiplier_decimal = Decimal(str(multiplier))
+        new_value = self._value * multiplier_decimal
+        return Quantity(new_value, self._precision)
 
     def __truediv__(self, divisor: int | float | Decimal) -> "Quantity":
-        """Divide Quantity by a scalar."""
+        """Divide quantity by a number."""
         if not isinstance(divisor, int | float | Decimal):
             raise TypeError("Divisor must be a number")
         if divisor == 0:

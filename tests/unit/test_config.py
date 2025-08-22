@@ -1,9 +1,9 @@
-"""Unit tests for configuration module."""
+"""Unit tests for the config module."""
 
 import os
 from unittest.mock import patch
 
-from src.alphaloop_core.config import settings
+from alphaloop_core.config import settings
 
 
 class TestConfig:

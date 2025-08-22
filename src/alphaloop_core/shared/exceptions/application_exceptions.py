@@ -1,132 +1,56 @@
 """Application-specific exceptions."""
 
-from .base import BaseException
+from .base import AlphaLoopError
 
 
-class UseCaseError(BaseException):
-    """Base class for use case errors."""
+class UseCaseError(AlphaLoopError):
+    """Raised when a use-case execution fails."""
 
-    def __init__(self, message: str, use_case: str | None = None) -> None:
+    def __init__(self, message: str, code: str | None = None) -> None:
         """Initialize use case error."""
-        super().__init__(message, code="USE_CASE_ERROR")
-        self.use_case = use_case
+        super().__init__(message, code)
 
 
-class MarketDataScrapingError(UseCaseError):
-    """Raised when market data scraping fails."""
+class BusinessRuleError(UseCaseError):
+    """Raised when a business rule is violated."""
 
-    def __init__(self, message: str) -> None:
-        """Initialize market data scraping error."""
-        super().__init__(message, use_case="scrape_market_data")
-
-
-class MarketDataProcessingError(UseCaseError):
-    """Raised when market data processing fails."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize market data processing error."""
-        super().__init__(message, use_case="process_market_data")
+    def __init__(self, message: str, rule: str | None = None) -> None:
+        """Initialize business rule error."""
+        super().__init__(message, code="BUSINESS_RULE_VIOLATION")
+        self.rule = rule
 
 
-class MarketDataStorageError(UseCaseError):
-    """Raised when market data storage fails."""
+class DataValidationError(UseCaseError):
+    """Raised when data validation fails in a use case."""
 
-    def __init__(self, message: str) -> None:
-        """Initialize market data storage error."""
-        super().__init__(message, use_case="store_market_data")
-
-
-class TradeExecutionError(UseCaseError):
-    """Raised when trade execution fails."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize trade execution error."""
-        super().__init__(message, use_case="execute_trade")
+    def __init__(self, message: str, field: str | None = None) -> None:
+        """Initialize data validation error."""
+        super().__init__(message, code="DATA_VALIDATION_ERROR")
+        self.field = field
 
 
-class SignalAnalysisError(UseCaseError):
-    """Raised when signal analysis fails."""
+class ResourceNotFoundError(UseCaseError):
+    """Raised when a required resource is not found."""
 
-    def __init__(self, message: str) -> None:
-        """Initialize signal analysis error."""
-        super().__init__(message, use_case="analyze_signals")
-
-
-class PortfolioManagementError(UseCaseError):
-    """Raised when portfolio management fails."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize portfolio management error."""
-        super().__init__(message, use_case="manage_portfolio")
+    def __init__(self, message: str, resource_type: str | None = None) -> None:
+        """Initialize resource not found error."""
+        super().__init__(message, code="RESOURCE_NOT_FOUND")
+        self.resource_type = resource_type
 
 
-class RiskCalculationError(UseCaseError):
-    """Raised when risk calculation fails."""
+class PermissionError(UseCaseError):
+    """Raised when user lacks permission for an operation."""
 
-    def __init__(self, message: str) -> None:
-        """Initialize risk calculation error."""
-        super().__init__(message, use_case="calculate_risk")
-
-
-class FeatureGenerationError(UseCaseError):
-    """Raised when feature generation fails."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize feature generation error."""
-        super().__init__(message, use_case="generate_features")
+    def __init__(self, message: str, operation: str | None = None) -> None:
+        """Initialize permission error."""
+        super().__init__(message, code="PERMISSION_DENIED")
+        self.operation = operation
 
 
-class IndicatorCalculationError(UseCaseError):
-    """Raised when indicator calculation fails."""
+class ConcurrencyError(UseCaseError):
+    """Raised when concurrent access conflicts occur."""
 
-    def __init__(self, message: str) -> None:
-        """Initialize indicator calculation error."""
-        super().__init__(message, use_case="calculate_indicators")
-
-
-class PredictionError(UseCaseError):
-    """Raised when prediction fails."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize prediction error."""
-        super().__init__(message, use_case="predict_returns")
-
-
-class BacktestError(UseCaseError):
-    """Raised when backtesting fails."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize backtest error."""
-        super().__init__(message, use_case="backtest_strategy")
-
-
-class HealthCheckError(UseCaseError):
-    """Raised when health check fails."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize health check error."""
-        super().__init__(message, use_case="health_check")
-
-
-class DatabaseBackupError(UseCaseError):
-    """Raised when database backup fails."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize database backup error."""
-        super().__init__(message, use_case="backup_database")
-
-
-class DataCleanupError(UseCaseError):
-    """Raised when data cleanup fails."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize data cleanup error."""
-        super().__init__(message, use_case="cleanup_data")
-
-
-class DataSynchronizationError(UseCaseError):
-    """Raised when data synchronization fails."""
-
-    def __init__(self, message: str) -> None:
-        """Initialize data synchronization error."""
-        super().__init__(message, use_case="synchronize_data")
+    def __init__(self, message: str, resource: str | None = None) -> None:
+        """Initialize concurrency error."""
+        super().__init__(message, code="CONCURRENCY_CONFLICT")
+        self.resource = resource

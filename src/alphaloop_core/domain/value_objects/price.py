@@ -63,10 +63,14 @@ class Price:
         """Multiply Price by a scalar."""
         if not isinstance(multiplier, int | float | Decimal):
             raise TypeError("Multiplier must be a number")
-        return Price(self._value * Decimal(str(multiplier)), self._currency)
+
+        # Convert to Decimal for precise arithmetic
+        multiplier_decimal = Decimal(str(multiplier))
+        new_value = self._value * multiplier_decimal
+        return Price(new_value, self._currency)
 
     def __truediv__(self, divisor: int | float | Decimal) -> "Price":
-        """Divide Price by a scalar."""
+        """Divide price by a number."""
         if not isinstance(divisor, int | float | Decimal):
             raise TypeError("Divisor must be a number")
         if divisor == 0:

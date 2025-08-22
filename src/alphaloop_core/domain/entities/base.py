@@ -1,11 +1,11 @@
-"""Base entity class for all domain entities."""
+"""Abstract base class for all domain entities."""
 
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Any
 from uuid import UUID, uuid4
 
-from ..shared.types.enums import EntityStatus
+from alphaloop_core.shared.types.enums import EntityStatus
 
 
 class Entity(ABC):

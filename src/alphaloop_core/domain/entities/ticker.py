@@ -160,7 +160,7 @@ class Ticker(Entity):
             "max_quantity": str(self._max_quantity) if self._max_quantity else None,
             "tick_size": self._tick_size,
             "step_size": self._step_size,
-            "is_active": self._is_active,
+            "is_active": self.is_active(),
             "status": self.status.value,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),

@@ -1,9 +1,9 @@
 """Validation-specific exceptions."""
 
-from ..exceptions.base import BaseException
+from ..exceptions.base import AlphaLoopError
 
 
-class ValidationError(BaseException):
+class ValidationError(AlphaLoopError):
     """Base class for validation errors."""
 
     def __init__(self, message: str, field: str | None = None) -> None:
