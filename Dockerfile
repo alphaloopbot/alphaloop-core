@@ -15,13 +15,14 @@ COPY pyproject.toml poetry.lock* ./
 
 # Install dependencies
 RUN poetry config virtualenvs.create false \
-    && poetry install --only main
+    && poetry install --only main --no-interaction --no-ansi
 
 # Copy application code
 COPY . .
 
-# Install the package in editable mode
-RUN python -m pip install --no-cache-dir --editable .
+# Create non-root user and take ownership
+RUN useradd -m -u 10001 appuser && chown -R appuser /app
+USER appuser
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \

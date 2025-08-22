@@ -66,9 +66,13 @@ restart-no-cache: ## Restart all services with fresh Docker builds (no cache)
 wait-for-services: ## Wait for services needed by integration tests
 	@echo "Waiting for services needed by integration tests..."
 	@echo "Waiting for Database..."
-	@until docker compose exec -T database pg_isready -U postgres > /dev/null 2>&1; do sleep 1; done
+	@t=120; until docker compose exec -T database pg_isready -U postgres > /dev/null 2>&1; do \
+	  sleep 1; t=$$((t-1)); if [ $$t -le 0 ]; then echo "Database not ready after 120s"; exit 1; fi; \
+	done
 	@echo "Waiting for API..."
-	@until curl -s http://localhost:8000/health > /dev/null 2>&1; do sleep 1; done
+	@t=120; until curl -s http://localhost:8000/health > /dev/null 2>&1; do \
+	  sleep 1; t=$$((t-1)); if [ $$t -le 0 ]; then echo "API not ready after 120s"; exit 1; fi; \
+	done
 	@echo "Integration tests ready! ✨"
 
 logs: ## Show logs from all services
@@ -78,7 +82,7 @@ status: ## Show service status
 	docker compose ps
 
 run-api: ## Run the API locally
-	poetry run uvicorn src.alphaloop_core.api:app --reload --host 0.0.0.0 --port 8000
+	poetry run uvicorn alphaloop_core.api:app --reload --host 0.0.0.0 --port 8000
 
 run-cli: ## Run the CLI
 	poetry run alphaloop-cli --help

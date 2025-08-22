@@ -12,9 +12,12 @@ We will follow these core architectural axioms:
 ### 🏗️ **Clean Architecture Axioms**
 
 #### A1: **Dependency Rule**
-- **Axiom**: Dependencies must point inward. Domain → Application → Infrastructure
-- **Violation**: If any outer layer imports from an inner layer, the code is wrong
-- **Example**: Infrastructure importing domain entities directly = ❌
+- **Axiom**: Dependencies must point inward (Infrastructure → Application → Domain).
+- **Violation**: If an inner layer depends on an outer layer, it's wrong.
+- **Examples**:
+  - Domain importing SQLAlchemy (infrastructure) = ❌
+  - Application depending on a concrete DB driver instead of an interface = ❌
+  - Infrastructure importing Domain entities and interfaces = ✅
 
 #### A2: **Domain Independence**
 - **Axiom**: Domain layer must be completely independent of external concerns
@@ -65,9 +68,17 @@ We will follow these core architectural axioms:
 ### 🛡️ **Error Handling Axioms**
 
 #### A10: **Domain Exception Hierarchy**
-- **Axiom**: All exceptions must inherit from appropriate base classes
+- **Axiom**: All exceptions must inherit from `AlphaLoopError` base class
 - **Violation**: If exceptions don't follow the hierarchy, they're wrong
-- **Example**: Domain exception inheriting from generic Exception = ❌
+- **Example**: Domain exception inheriting directly from Exception instead of AlphaLoopError = ❌
+- **Correct**: Domain exception inheriting from AlphaLoopError = ✅
+
+**Implementation Notes:**
+- **Fully-qualified name**: `alphaloop_core.shared.exceptions.base.AlphaLoopError`
+- **Inheritance guidance**:
+  - Python: `class AlphaLoopError(Exception): ...`
+  - TypeScript/JavaScript: `class AlphaLoopError extends Error { ... }`
+  - JVM/.NET: `public class AlphaLoopException extends Exception { ... }`
 
 #### A11: **Exception Context**
 - **Axiom**: Exceptions must provide meaningful context and be actionable
