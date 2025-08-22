@@ -14,11 +14,24 @@ logger = logging.getLogger(__name__)
 class HeartbeatGenerator:
     """Generates heartbeat files for service monitoring."""
 
-    def __init__(self, service_name: str, settings: HeartbeatSettings | None = None) -> None:
+    def __init__(
+        self,
+        service_name: str,
+        settings: HeartbeatSettings | None = None,
+        interval: int | None = None,
+        version: str | None = None,
+    ) -> None:
         """Initialize the heartbeat generator."""
         self.service_name = service_name
         self.settings = settings or HeartbeatSettings()
         self._running = False
+        # Runtime configuration derived from settings or explicit overrides
+        self._interval = (
+            interval
+            if interval is not None
+            else getattr(self.settings, "default_interval_seconds", 60)
+        )
+        self.version = version or "1.0.0"
 
     async def generate_heartbeat(self) -> None:
         """Generate a heartbeat file for the service."""
@@ -27,7 +40,7 @@ class HeartbeatGenerator:
                 "service_name": self.service_name,
                 "timestamp": get_current_timestamp(),
                 "status": "healthy",
-                "version": self.settings.version,
+                "version": self.version,
             }
 
             heartbeat_file = get_heartbeat_file_path(self.service_name)
@@ -50,7 +63,7 @@ class HeartbeatGenerator:
         while self._running:
             try:
                 await self.generate_heartbeat()
-                await asyncio.sleep(self.settings.heartbeat_interval)
+                await asyncio.sleep(self._interval)
             except asyncio.CancelledError:
                 raise
             except Exception as e:
@@ -80,11 +93,11 @@ async def main() -> None:
 
     # Configure settings
     settings = HeartbeatSettings()
-    settings.heartbeat_interval = args.interval
-    settings.version = args.version
 
-    # Create generator
-    generator = HeartbeatGenerator(args.service_name, settings)
+    # Create generator with explicit interval/version overrides
+    generator = HeartbeatGenerator(
+        args.service_name, settings, interval=args.interval, version=args.version
+    )
 
     # Set up signal handlers
     def signal_handler(signum: int, frame: object) -> None:

@@ -114,8 +114,15 @@ class DatabaseConnectionManager:
                 return
 
             try:
-                # Parse database URL for asyncpg
-                db_url = self._database_url.replace("postgresql+asyncpg://", "postgresql://")
+                # Parse database URL for asyncpg (driver-agnostic)
+                try:
+                    url = make_url(self._database_url)
+                    db_url = url.set(drivername="postgresql").render_as_string(hide_password=False)
+                except Exception:
+                    # Fallback: basic replace for common async driver suffixes
+                    db_url = self._database_url.replace(
+                        "postgresql+asyncpg://", "postgresql://"
+                    ).replace("postgresql+psycopg://", "postgresql://")
 
                 self._pool = await asyncpg.create_pool(
                     db_url,

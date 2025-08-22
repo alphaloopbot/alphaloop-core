@@ -19,6 +19,14 @@ class DatabaseError(InfrastructureError):
         super().__init__(message, code)
 
 
+class DatabaseConnectionError(DatabaseError):
+    """Raised when database connection or initialization fails."""
+
+    def __init__(self, message: str, code: str | None = None) -> None:
+        """Initialize database connection error."""
+        super().__init__(message, code)
+
+
 class ConnectionError(InfrastructureError):
     """Raised for connection-related issues."""
 

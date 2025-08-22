@@ -25,9 +25,9 @@ We will follow these core architectural axioms:
 - **Example**: Domain entity importing SQLAlchemy = ❌
 
 #### A3: **Use Case Orchestration**
-- **Axiom**: Application layer orchestrates domain objects, never contains business logic
-- **Violation**: If use cases contain business rules instead of coordinating them, they're wrong
-- **Example**: Use case calculating risk instead of calling domain service = ❌
+- **Axiom**: Application layer orchestrates domain objects and enforces application workflow/policy; enterprise business rules stay in the Domain.
+- **Violation**: If use cases embed domain/enterprise rules instead of delegating to the Domain, it's a violation.
+- **Example**: Use case calculating risk (a domain rule) instead of calling a domain service = ❌
 
 ### 🔒 **Immutability Axioms**
 

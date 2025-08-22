@@ -70,7 +70,7 @@ wait-for-services: ## Wait for services needed by integration tests
 	  sleep 1; t=$$((t-1)); if [ $$t -le 0 ]; then echo "Database not ready after 120s"; exit 1; fi; \
 	done
 	@echo "Waiting for API..."
-	@t=120; until curl -s http://localhost:8000/health > /dev/null 2>&1; do \
+	@t=120; until curl -sf http://localhost:8000/health > /dev/null; do \
 	  sleep 1; t=$$((t-1)); if [ $$t -le 0 ]; then echo "API not ready after 120s"; exit 1; fi; \
 	done
 	@echo "Integration tests ready! ✨"
