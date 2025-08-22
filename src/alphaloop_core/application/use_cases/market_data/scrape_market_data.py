@@ -71,11 +71,11 @@ class ScrapeMarketDataUseCase:
                 raise MarketDataScrapingError(f"No tickers found for exchange {exchange_id}")
 
             # Set default data types if not specified
-            if not data_types:
+            if data_types is None:
                 data_types = [MarketDataType.TICKER, MarketDataType.TRADE]
 
             # Set default timeframe if not specified
-            if not timeframe:
+            if timeframe is None:
                 timeframe = Timeframe.MINUTE_1
 
             # Initialize results tracking
@@ -154,7 +154,9 @@ class ScrapeMarketDataUseCase:
                 )
                 ticker_results["data"][data_type.value] = data
                 ticker_results["data_points"] += len(data) if data else 0
-                ticker_results["timestamp"] = data[-1]["timestamp"] if data else None
+                last_ts = data[-1].get("timestamp") if data and isinstance(data[-1], dict) else None
+                if last_ts is not None:
+                    ticker_results["timestamp"] = last_ts
             except Exception as e:
                 ticker_results["data"][data_type.value] = {"error": str(e)}
 

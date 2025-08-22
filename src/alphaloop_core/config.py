@@ -3,6 +3,7 @@
 import os
 from functools import lru_cache
 from pathlib import Path
+from types import MappingProxyType
 
 from dotenv import load_dotenv
 
@@ -20,7 +21,7 @@ for env_path in env_paths:
 
 
 @lru_cache
-def settings() -> dict[str, str]:
+def settings() -> MappingProxyType[str, str]:
     """Get application settings from environment variables."""
     # Automatic URL construction from HOST:PORT variables
     service_host = os.getenv("SERVICE_HOST", "localhost")
@@ -35,7 +36,7 @@ def settings() -> dict[str, str]:
         else f"http://{service_host}:{service_port}"
     )
 
-    return {
+    cfg = {
         "SERVICE_URL": service_url,
         "API_KEY": os.getenv("API_KEY", "dev-key"),
         "LOG_LEVEL": os.getenv("LOG_LEVEL", "INFO"),
@@ -45,7 +46,11 @@ def settings() -> dict[str, str]:
         "DB_NAME": os.getenv("DB_NAME", "alphaloop"),
         "DB_USER": os.getenv("DB_USER", "postgres"),
         "DB_PASSWORD": os.getenv("DB_PASSWORD", "password"),
+        # DATABASE_URL fallback composed from individual DB_* vars to prevent drift
         "DATABASE_URL": os.getenv(
-            "DATABASE_URL", "postgresql://postgres:password@localhost:5432/alphaloop"
+            "DATABASE_URL",
+            f"postgresql://{os.getenv('DB_USER','postgres')}:{os.getenv('DB_PASSWORD','password')}"
+            f"@{os.getenv('DB_HOST','localhost')}:{os.getenv('DB_PORT','5432')}/{os.getenv('DB_NAME','alphaloop')}",
         ),
     }
+    return MappingProxyType(cfg)

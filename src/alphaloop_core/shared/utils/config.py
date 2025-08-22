@@ -81,7 +81,10 @@ def get_rabbitmq_url() -> str:
     password = os.getenv("RABBITMQ_PASSWORD", "guest")
     vhost = os.getenv("RABBITMQ_VHOST", "/")
 
-    return f"amqp://{user}:{password}@{host}:{port}/{vhost}"
+    # Percent-encode vhost to support "/" and special characters
+    from urllib.parse import quote
+
+    return f"amqp://{user}:{password}@{host}:{port}/{quote(vhost, safe='')}"
 
 
 @lru_cache

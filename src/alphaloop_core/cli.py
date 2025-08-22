@@ -1,10 +1,41 @@
 """Command-line interface for AlphaLoop Core."""
 
 import argparse
+import re
 import sys
 from typing import NoReturn
+from urllib.parse import urlsplit, urlunsplit
 
 from .config import settings
+
+SENSITIVE_KEY_SUBSTRINGS = (
+    "password",
+    "key",
+    "secret",
+    "token",
+    "apikey",
+    "access_key",
+    "private_key",
+)
+
+
+def _is_sensitive_key(key: str) -> bool:
+    k = key.lower()
+    return any(s in k for s in SENSITIVE_KEY_SUBSTRINGS)
+
+
+def _mask_dsn(value: str) -> str:
+    try:
+        parts = urlsplit(value)
+        if "@" not in parts.netloc or ":" not in parts.netloc.split("@", 1)[0]:
+            return value  # no credentials present
+        userinfo, host = parts.netloc.split("@", 1)
+        user = userinfo.split(":", 1)[0]
+        masked_netloc = f"{user}:***@{host}"
+        return urlunsplit((parts.scheme, masked_netloc, parts.path, parts.query, parts.fragment))
+    except Exception:
+        # Conservative fallback: redact anything between : and @
+        return re.sub(r":[^@]+@", ":***@", value)
 
 
 def main() -> NoReturn:
@@ -68,9 +99,11 @@ def show_config(key: str | None = None) -> None:
     else:
         print("=== AlphaLoop Core Configuration ===")
         for k, v in config.items():
-            # Mask sensitive values
-            if "password" in k.lower() or "key" in k.lower():
+            # Mask sensitive values and DSNs containing credentials
+            if _is_sensitive_key(k):
                 v = "***" if v else "not set"
+            elif k.upper() in {"DATABASE_URL"}:
+                v = _mask_dsn(v)
             print(f"{k}: {v}")
 
 
