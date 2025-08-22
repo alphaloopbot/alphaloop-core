@@ -13,7 +13,7 @@ A comprehensive trading system built with Clean Architecture principles and mode
 - **Development Tools**: Makefile workflows, GitHub PR analysis tools
 - **Configuration**: Centralized environment management with configurable defaults
 - **Currency Support**: Configurable default currency (USDT) for market data and trading
-- **Reusable Packages**: Modular packages for heartbeat, logging, database, and data processing
+- **Reusable Packages**: Modular packages for heartbeat, logging, security, storage, database, and data processing
 - **Exchange Integrations**: Support for multiple cryptocurrency exchanges
 - **Real-time Processing**: Async processing with message queues
 - **Monitoring**: Health checks, logging, and alerting systems
@@ -152,6 +152,7 @@ alphaloop-core/
 │   ├── alphaloop-heartbeat/     # Health monitoring
 │   ├── alphaloop-security/      # Encryption & authentication
 │   ├── alphaloop-logging/       # Advanced logging with Telegram
+│   ├── alphaloop-storage/       # Unified data storage & management
 │   ├── alphaloop-database/      # Database abstractions
 │   └── alphaloop-data/          # Data processing utilities
 ├── docker/                       # Docker configurations
