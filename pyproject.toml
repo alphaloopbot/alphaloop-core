@@ -100,7 +100,7 @@ warn_no_return = true
 warn_unreachable = false
 strict_equality = true
 disable_error_code = ["import-not-found", "misc", "unused-ignore", "unreachable", "no-any-return", "dict-item"]
-exclude = ["packages/alphaloop-logging/"]
+
 
 [[tool.mypy.overrides]]
 module = [

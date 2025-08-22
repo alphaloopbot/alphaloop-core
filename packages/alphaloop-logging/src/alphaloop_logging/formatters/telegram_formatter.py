@@ -11,11 +11,11 @@ class TelegramFormatter(BaseFormatter):
 
     # Emoji and style mapping for log levels
     LEVEL_STYLES = {
-        "DEBUG": {"emoji": "🔍", "style": "🚧 DEBUG 🚧"},
+        "DEBUG": {"emoji": "🔍", "style": "🔍 DEBUG 🔍"},
         "INFO": {"emoji": "📢", "style": "📢 INFO 📢"},
         "WARNING": {"emoji": "⚠️", "style": "⚠️ WARNING ⚠️"},
         "ERROR": {"emoji": "🚨", "style": "🚨 ERROR 🚨"},
-        "CRITICAL": {"emoji": "💥", "style": "🚨 CRITICAL 🚨"},
+        "CRITICAL": {"emoji": "💥", "style": "💥 CRITICAL 💥"},
     }
 
     def __init__(

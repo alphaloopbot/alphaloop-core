@@ -3,7 +3,7 @@
 import asyncio
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, TextIO
 
 from ..config.settings import FileConfig
 from ..exceptions import HandlerError
@@ -27,7 +27,7 @@ class FileHandler(BaseHandler):
         self.app_name = app_name
         self._lock = asyncio.Lock()
         self._current_file: Path | None = None
-        self._file_handle = None
+        self._file_handle: TextIO | None = None
 
         # Ensure logs directory exists
         self.logs_path = Path(config.logs_path)
@@ -89,7 +89,7 @@ class FileHandler(BaseHandler):
         """Open the current log file."""
         if self._current_file:
             try:
-                self._file_handle = await asyncio.get_event_loop().run_in_executor(  # type: ignore
+                self._file_handle = await asyncio.get_event_loop().run_in_executor(
                     None, self._open_file_sync
                 )
             except Exception as e:
@@ -97,7 +97,7 @@ class FileHandler(BaseHandler):
                     f"Failed to open log file {self._current_file}: {str(e)}"
                 )
 
-    def _open_file_sync(self):  # type: ignore
+    def _open_file_sync(self) -> TextIO | None:
         """Open file synchronously."""
         if self._current_file:
             return open(self._current_file, "a", 1)  # Line buffered
