@@ -93,8 +93,8 @@ sequenceDiagram
 ## 📦 Installation
 
 ```bash
-# From the packages directory
-cd packages/alphaloop-heartbeat
+# From the infrastructure directory
+cd infrastructure/alphaloop-heartbeat
 poetry install
 ```
 

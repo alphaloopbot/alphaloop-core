@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Example: Using Official AlphaLoop Packages in Core
+Example: Using Official AlphaLoop Infrastructure Packages in Core
 
-This example demonstrates how alphaloop-core should use the official packages
+This example demonstrates how alphaloop-core should use the official infrastructure packages
 instead of implementing functionality directly.
 """
 
@@ -12,9 +12,9 @@ from alphaloop_core import get_all_package_configs, service_factory
 
 
 async def example_using_official_packages():
-    """Example of using official packages in alphaloop-core."""
+    """Example of using official infrastructure packages in alphaloop-core."""
 
-    print("🚀 AlphaLoop Core - Using Official Packages")
+    print("🚀 AlphaLoop Core - Using Official Infrastructure Packages")
     print("=" * 50)
 
     # 1. Get all package configurations
@@ -87,16 +87,16 @@ async def example_using_official_packages():
     print("  ✅ All services closed")
 
     print("\n🎉 Example completed successfully!")
-    print("✅ alphaloop-core is now properly using official packages!")
+    print("✅ alphaloop-core is now properly using official infrastructure packages!")
 
 
 async def example_direct_package_usage():
-    """Example of using packages directly (alternative approach)."""
+    """Example of using infrastructure packages directly (alternative approach)."""
 
     print("\n🔄 Alternative: Direct Package Usage")
     print("=" * 40)
 
-    # Direct imports from packages
+    # Direct imports from infrastructure packages
     from alphaloop_cache import CacheConfig, CacheManager
     from alphaloop_logging import AlphaLoopLogger, LoggingConfig
     from alphaloop_storage import DatabaseConfig, DatabaseManager
@@ -134,7 +134,7 @@ async def main():
         await example_direct_package_usage()
 
         print("\n" + "=" * 60)
-        print("🎯 Key Benefits of Using Official Packages:")
+        print("🎯 Key Benefits of Using Official Infrastructure Packages:")
         print("  ✅ No code duplication")
         print("  ✅ Consistent APIs across the system")
         print("  ✅ Centralized configuration management")

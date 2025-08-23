@@ -12,9 +12,9 @@ import sys
 import tempfile
 from pathlib import Path
 
-# Add the packages directory to the path
+# Add the infrastructure directory to the path
 sys.path.insert(
-    0, os.path.join(os.path.dirname(__file__), "..", "packages", "alphaloop-logging", "src")
+    0, os.path.join(os.path.dirname(__file__), "..", "infrastructure", "alphaloop-logging", "src")
 )
 
 from alphaloop_logging import (

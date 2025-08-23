@@ -9,10 +9,10 @@ for authentication, encryption, and secure URL handling.
 import os
 import sys
 
-# Add the packages directory to the path
+# Add the infrastructure directory to the path
 sys.path.insert(
     0,
-    os.path.join(os.path.dirname(__file__), "..", "packages", "alphaloop-security", "src"),
+    os.path.join(os.path.dirname(__file__), "..", "infrastructure", "alphaloop-security", "src"),
 )
 
 from alphaloop_security import (

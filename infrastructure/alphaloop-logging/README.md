@@ -17,8 +17,8 @@ A comprehensive, asynchronous logging package for AlphaLoop Core with multi-hand
 ## Installation
 
 ```bash
-# From the packages directory
-cd packages/alphaloop-logging
+# From the infrastructure directory
+cd infrastructure/alphaloop-logging
 poetry install
 ```
 

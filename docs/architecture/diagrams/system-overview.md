@@ -183,7 +183,7 @@ The following diagrams are conceptual and may not reflect the current implementa
 Shows a generic data processing pipeline from ingestion to consumption. This is a conceptual view of how data could flow through the system.
 
 ### Library Architecture
-Shows how the AlphaLoop Core library and packages could be organized. The AlphaLoop Core library provides the foundation for all services.
+Shows how the AlphaLoop Core library and infrastructure packages could be organized. The AlphaLoop Core library provides the foundation for all services.
 
 **AlphaLoop Core Library**: This is the main library that contains the core business logic, domain entities, use cases, and infrastructure code. It's the foundation that all services (cloud and edge devices) use to implement their functionality.
 
@@ -204,7 +204,7 @@ graph TB
         SHARED[Shared Layer<br/>Utilities]
     end
 
-    subgraph "Packages"
+    subgraph "Infrastructure Packages"
         AH[alphaloop-heartbeat<br/>Health Monitoring]
         AL[alphaloop-logging<br/>Logging & Reporting]
         ASEC[alphaloop-security<br/>Encryption & Auth]

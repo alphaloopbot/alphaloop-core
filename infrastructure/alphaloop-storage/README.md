@@ -77,8 +77,8 @@ graph TB
 ## 📦 Installation
 
 ```bash
-# From the packages directory
-cd packages/alphaloop-storage
+# From the infrastructure directory
+cd infrastructure/alphaloop-storage
 poetry install
 ```
 

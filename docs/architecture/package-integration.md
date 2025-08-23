@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document explains how `alphaloop-core` has been refactored to properly use the official AlphaLoop packages instead of implementing functionality directly. This ensures clean architecture, avoids code duplication, and provides consistent APIs across the system.
+This document explains how `alphaloop-core` has been refactored to properly use the official AlphaLoop infrastructure packages instead of implementing functionality directly. This ensures clean architecture, avoids code duplication, and provides consistent APIs across the system.
 
 ## Before vs After
 
@@ -17,7 +17,7 @@ psutil = "^5.9"          # Direct system monitoring
 
 ### ✅ **After: Official Package Dependencies**
 ```toml
-# pyproject.toml - Official packages
+# pyproject.toml - Official infrastructure packages
 alphaloop-heartbeat = {path = "infrastructure/alphaloop-heartbeat"}
 alphaloop-security = {path = "infrastructure/alphaloop-security"}
 alphaloop-logging = {path = "infrastructure/alphaloop-logging"}
@@ -62,7 +62,7 @@ def get_storage_config() -> DatabaseConfig:
 ```python
 # src/alphaloop_core/shared/utils/service_factory.py
 class ServiceFactory:
-    """Factory for creating services using official AlphaLoop packages."""
+    """Factory for creating services using official AlphaLoop infrastructure packages."""
 
     async def get_cache_manager(self) -> CacheManager:
         """Get or create cache manager."""
@@ -195,7 +195,7 @@ print(f"Storage config: {configs['storage']}")
 - **Type Safety**: Full type hints and validation
 
 ### **✅ Maintainability**
-- **Centralized Updates**: Update packages independently
+- **Centralized Updates**: Update infrastructure packages independently
 - **Version Control**: Track package versions separately
 - **Dependency Management**: Clear dependency boundaries
 - **Documentation**: Package-specific documentation
@@ -204,7 +204,7 @@ print(f"Storage config: {configs['storage']}")
 - **Clean Separation**: Clear boundaries between concerns
 - **Modularity**: Independent, reusable components
 - **Scalability**: Easy to extend and modify
-- **Standards**: Consistent patterns across packages
+- **Standards**: Consistent patterns across infrastructure packages
 
 ### **✅ Development Experience**
 - **Easy Integration**: Simple service factory pattern
@@ -327,12 +327,12 @@ HEARTBEAT_DIRECTORY=./heartbeats
 
 ## Conclusion
 
-The refactoring of `alphaloop-core` to use official packages represents a significant improvement in code quality, maintainability, and architecture. By leveraging the service factory pattern and centralized configuration management, the system now provides:
+The refactoring of `alphaloop-core` to use official infrastructure packages represents a significant improvement in code quality, maintainability, and architecture. By leveraging the service factory pattern and centralized configuration management, the system now provides:
 
 - **Clean separation of concerns**
-- **Consistent APIs across packages**
+- **Consistent APIs across infrastructure packages**
 - **Easy testing and mocking**
 - **Centralized configuration management**
 - **Better error handling and debugging**
 
-This approach ensures that `alphaloop-core` focuses on its core responsibilities while delegating specialized functionality to dedicated, well-tested packages.
+This approach ensures that `alphaloop-core` focuses on its core responsibilities while delegating specialized functionality to dedicated, well-tested infrastructure packages.

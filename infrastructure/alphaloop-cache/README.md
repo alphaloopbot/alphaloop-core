@@ -81,8 +81,8 @@ graph TB
 ## 📦 Installation
 
 ```bash
-# From the packages directory
-cd packages/alphaloop-cache
+# From the infrastructure directory
+cd infrastructure/alphaloop-cache
 poetry install
 ```
 
@@ -307,7 +307,7 @@ for exchange in exchanges:
 latest_prices = await price_cache.get_latest_prices([symbol], "binance")
 ```
 
-## 🔄 Integration with Other Packages
+## 🔄 Integration with Other Infrastructure Packages
 
 ### **With alphaloop-storage**
 

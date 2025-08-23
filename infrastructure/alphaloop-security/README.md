@@ -13,8 +13,8 @@ A comprehensive security package for AlphaLoop Core providing encryption, authen
 ## Installation
 
 ```bash
-# From the packages directory
-cd packages/alphaloop-security
+# From the infrastructure directory
+cd infrastructure/alphaloop-security
 poetry install
 ```
 

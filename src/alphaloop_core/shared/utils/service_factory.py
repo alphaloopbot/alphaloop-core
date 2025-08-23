@@ -1,4 +1,4 @@
-"""Service factory for AlphaLoop Core using official packages."""
+"""Service factory for AlphaLoop Core using official infrastructure packages."""
 
 from alphaloop_cache import CacheManager, PriceCache, PubSubManager
 from alphaloop_heartbeat import HeartbeatChecker, HeartbeatGenerator
@@ -16,7 +16,7 @@ from .package_config import (
 
 
 class ServiceFactory:
-    """Factory for creating services using official AlphaLoop packages."""
+    """Factory for creating services using official AlphaLoop infrastructure packages."""
 
     def __init__(self) -> None:
         """Initialize the service factory."""
@@ -97,7 +97,10 @@ class ServiceFactory:
         return DataEncryptor(passphrase=config["secret_key"], period_size=config["time_window"])
 
     def get_secure_url_composer(
-        self, target_ip: str = "localhost", target_port: int = 8000, endpoint: str = "/api"
+        self,
+        target_ip: str = "localhost",
+        target_port: int = 8000,
+        endpoint: str = "/api",
     ) -> SecureURLComposer:
         """Get secure URL composer."""
         config = get_security_config()
