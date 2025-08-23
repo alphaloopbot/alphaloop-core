@@ -27,6 +27,34 @@ dev: ## Install development dependencies and run full development cycle
 test: ## Run unit tests
 	poetry run pytest tests/unit/ -v
 
+test-infrastructure: ## Run tests for all infrastructure packages
+	@echo "🧪 Running tests for all infrastructure packages..."
+	@echo "Installing dependencies for all packages..."
+	@cd infrastructure/alphaloop-heartbeat && poetry install
+	@cd infrastructure/alphaloop-logging && poetry install
+	@cd infrastructure/alphaloop-security && poetry install
+	@cd infrastructure/alphaloop-storage && poetry install
+	@cd infrastructure/alphaloop-cache && poetry install
+	@echo "Testing alphaloop-heartbeat..."
+	@cd infrastructure/alphaloop-heartbeat && poetry run pytest tests/ -v
+	@echo "Testing alphaloop-logging..."
+	@cd infrastructure/alphaloop-logging && poetry run pytest tests/ -v
+	@echo "Testing alphaloop-security..."
+	@cd infrastructure/alphaloop-security && poetry run pytest tests/ -v
+	@echo "Testing alphaloop-storage..."
+	@cd infrastructure/alphaloop-storage && poetry run pytest tests/ -v
+	@echo "Testing alphaloop-cache..."
+	@cd infrastructure/alphaloop-cache && poetry run pytest tests/ -v
+	@echo "✅ All infrastructure tests completed!"
+
+test-all: ## Run all tests (main project + infrastructure)
+	@echo "🚀 Running all tests..."
+	@echo "1. Running main project tests..."
+	@$(MAKE) test
+	@echo "2. Running infrastructure tests..."
+	@$(MAKE) test-infrastructure
+	@echo "✅ All tests completed!"
+
 test-conda: ## Test conda environment setup
 	python scripts/test_conda_env.py
 
