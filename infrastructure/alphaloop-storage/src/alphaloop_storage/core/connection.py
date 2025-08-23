@@ -1,4 +1,22 @@
-"""Database connection management for AlphaLoop Storage."""
+"""
+Database connection management for AlphaLoop Storage.
+
+This module provides comprehensive database connection management for the AlphaLoop
+Storage system, supporting both synchronous and asynchronous database operations
+with connection pooling, configuration management, and error handling.
+
+The module includes configuration management, connection pooling, session
+management, and utilities for database operations with proper resource cleanup.
+
+Key Features:
+- Synchronous and asynchronous database support
+- Connection pooling and management
+- Configuration from environment variables
+- Session management with context managers
+- Error handling and validation
+- SSL/TLS support
+- Connection health monitoring
+"""
 
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
@@ -15,7 +33,33 @@ from ..exceptions import DatabaseConnectionError, DatabaseQueryError
 
 @dataclass
 class DatabaseConfig:
-    """Configuration for database connections."""
+    """
+    Configuration for database connections.
+
+    This class encapsulates all configuration parameters needed for database
+    connections, including connection details, pooling settings, and security
+    parameters. It provides validation and environment variable loading
+    capabilities.
+
+    The configuration supports both development and production environments
+    with sensible defaults and comprehensive validation.
+
+    Key Features:
+    - Connection parameter management
+    - Environment variable loading
+    - Configuration validation
+    - SSL/TLS support
+    - Connection pooling configuration
+    - Timeout settings
+
+    Usage:
+        config = DatabaseConfig.from_env(prefix="DB_")
+        config = DatabaseConfig(
+            host="localhost",
+            port=5432,
+            database="myapp"
+        )
+    """
 
     host: str
     port: int = 5432

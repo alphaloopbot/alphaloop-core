@@ -1,4 +1,22 @@
-"""Cache connection management for AlphaLoop Cache."""
+"""
+Cache connection management for AlphaLoop Cache.
+
+This module provides comprehensive cache connection management for the AlphaLoop
+Cache system, supporting Redis/Valkey connections with connection pooling,
+configuration management, and error handling.
+
+The module includes configuration management, connection pooling, client
+management, and utilities for cache operations with proper resource cleanup.
+
+Key Features:
+- Redis/Valkey connection management
+- Connection pooling and configuration
+- Configuration from environment variables
+- SSL/TLS support
+- Connection health monitoring
+- Error handling and validation
+- Async support
+"""
 
 import json
 from dataclasses import dataclass
@@ -12,7 +30,34 @@ from ..exceptions import CacheConnectionError, CacheOperationError
 
 @dataclass
 class CacheConfig:
-    """Configuration for cache connections."""
+    """
+    Configuration for cache connections.
+
+    This class encapsulates all configuration parameters needed for cache
+    connections, including connection details, pooling settings, and security
+    parameters. It provides validation and environment variable loading
+    capabilities.
+
+    The configuration supports both development and production environments
+    with sensible defaults and comprehensive validation for Redis/Valkey
+    connections.
+
+    Key Features:
+    - Connection parameter management
+    - Environment variable loading
+    - Configuration validation
+    - SSL/TLS support
+    - Connection pooling configuration
+    - Timeout settings
+
+    Usage:
+        config = CacheConfig.from_env(prefix="CACHE_")
+        config = CacheConfig(
+            host="localhost",
+            port=6379,
+            db=0
+        )
+    """
 
     host: str = "localhost"
     port: int = 6379

@@ -1,4 +1,23 @@
-"""Main AlphaLoop logger implementation."""
+"""
+Main AlphaLoop logger implementation.
+
+This module provides the core logging functionality for the AlphaLoop system,
+offering structured logging with multiple output handlers and advanced features
+for monitoring and debugging distributed systems.
+
+The logger supports multiple output destinations simultaneously, including
+console output, file logging, and Telegram notifications, with configurable
+formats and filtering capabilities.
+
+Key Features:
+- Multi-handler logging (console, file, Telegram)
+- Structured logging with metadata
+- Async support for non-blocking operations
+- Configurable message formatting
+- Caller information tracking
+- Message truncation and filtering
+- Telegram integration for alerts
+"""
 
 import asyncio
 import inspect
@@ -16,27 +35,61 @@ class AlphaLoopLogger:
     """
     Main AlphaLoop logger with multi-handler support.
 
-    This logger provides:
-    - File logging with rotation
-    - Console logging with colors
+    This class provides comprehensive logging capabilities for the AlphaLoop system,
+    supporting multiple output destinations simultaneously with structured logging
+    and advanced features for monitoring and debugging distributed systems.
+
+    The logger can output to console, files, and Telegram simultaneously, with
+    configurable formats, filtering, and async support for non-blocking operations.
+
+    Key Features:
+    - Multi-handler logging (console, file, Telegram)
+    - Structured logging with metadata
+    - Async support for non-blocking operations
+    - Configurable message formatting
+    - Caller information tracking
+    - Message truncation and filtering
     - Telegram integration for alerts
-    - Structured logging
-    - Async support
+
+    Usage:
+        config = LoggingConfig.from_env(app_name="my-service")
+        logger = AlphaLoopLogger(config)
+        await logger.info("Service started successfully")
+        await logger.error("Connection failed", extra={"retry_count": 3})
     """
 
     def __init__(self, config: LoggingConfig) -> None:
         """
         Initialize AlphaLoop logger.
 
+        Creates a new logger instance with the specified configuration. The logger
+        will automatically set up handlers based on the configuration and prepare
+        for logging operations.
+
         Args:
-            config: Logging configuration.
+            config: Logging configuration containing handler settings and behavior
+                   parameters
+
+        Example:
+            >>> config = LoggingConfig.from_env(app_name="my-service")
+            >>> logger = AlphaLoopLogger(config)
+            >>> # Logger is ready to use
         """
         self.config = config
         self.handlers: list[BaseHandler] = []
         self._setup_handlers()
 
     def _setup_handlers(self) -> None:
-        """Setup all configured handlers."""
+        """
+        Setup all configured handlers.
+
+        Initializes and configures all logging handlers based on the logger
+        configuration. This method is called during initialization and sets up
+        console, file, and Telegram handlers as specified in the config.
+
+        The method creates handler instances and adds them to the internal
+        handlers list for use during logging operations.
+        """
         # Console handler
         if self.config.console_config:
             console_handler = ConsoleHandler(self.config.console_config)
@@ -58,8 +111,20 @@ class AlphaLoopLogger:
         """
         Get information about the calling function.
 
+        Extracts information about the function that called the logging method,
+        including module name, function name, and line number. This information
+        is useful for debugging and tracing log messages back to their source.
+
         Returns:
-            Dictionary with caller information.
+            Dictionary containing caller information:
+            - module: Name of the calling module
+            - function: Name of the calling function
+            - line: Line number where the logging call was made
+
+        Example:
+            >>> info = logger._get_caller_info()
+            >>> print(info)
+            {'module': 'my_module', 'function': 'process_data', 'line': '42'}
         """
         if not self.config.include_caller_info:
             return {}
