@@ -14,15 +14,18 @@ pydantic = "^2.10"
 python-dotenv = "^1.0"
 sqlalchemy = {extras = ["asyncio"], version = "^2.0"}
 asyncpg = "^0.29"
-redis = "^5.0"
 aio-pika = "^9.0"
-psutil = "^5.9"
 aiofiles = "^24.0"
 pyyaml = "^6.0.1"
-cryptography = "^41.0.0"
 aiohttp = "^3.9.0"
-structlog = "^23.2.0"
 rich = "^13.7.0"
+
+# Official AlphaLoop packages
+alphaloop-heartbeat = {path = "packages/alphaloop-heartbeat"}
+alphaloop-security = {path = "packages/alphaloop-security"}
+alphaloop-logging = {path = "packages/alphaloop-logging"}
+alphaloop-storage = {path = "packages/alphaloop-storage"}
+alphaloop-cache = {path = "packages/alphaloop-cache"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2"

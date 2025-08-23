@@ -48,22 +48,19 @@ def get_database_url() -> str:
 
 @lru_cache
 def get_redis_url() -> str:
-    """Get the Redis URL from environment variables."""
-    load_environment()
+    """Get the Redis URL from environment variables (DEPRECATED: Use alphaloop-cache package)."""
+    import warnings
 
-    redis_url = os.getenv("REDIS_URL")
-    if redis_url:
-        return redis_url
+    warnings.warn(
+        "get_redis_url() is deprecated. Use alphaloop_core.get_cache_config() instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
-    host = os.getenv("REDIS_HOST", "localhost")
-    port = os.getenv("REDIS_PORT", "6379")
-    password = os.getenv("REDIS_PASSWORD")
-    db = os.getenv("REDIS_DB", "0")
+    from alphaloop_core import get_cache_config
 
-    if password:
-        return f"redis://:{password}@{host}:{port}/{db}"
-    else:
-        return f"redis://{host}:{port}/{db}"
+    config = get_cache_config()
+    return config.connection_url
 
 
 @lru_cache
