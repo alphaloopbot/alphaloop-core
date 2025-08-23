@@ -217,7 +217,7 @@ structlog = "^23.0.0"
 
 [package.source]
 type = "directory"
-url = "packages/alphaloop-cache"
+url = "infrastructure/alphaloop-cache"
 
 [[package]]
 name = "alphaloop-heartbeat"
@@ -235,7 +235,7 @@ psutil = "^5.9"
 
 [package.source]
 type = "directory"
-url = "packages/alphaloop-heartbeat"
+url = "infrastructure/alphaloop-heartbeat"
 
 [[package]]
 name = "alphaloop-logging"
@@ -255,7 +255,7 @@ structlog = "^23.2.0"
 
 [package.source]
 type = "directory"
-url = "packages/alphaloop-logging"
+url = "infrastructure/alphaloop-logging"
 
 [[package]]
 name = "alphaloop-security"
@@ -273,7 +273,7 @@ pydantic = "^2.0.0"
 
 [package.source]
 type = "directory"
-url = "packages/alphaloop-security"
+url = "infrastructure/alphaloop-security"
 
 [[package]]
 name = "alphaloop-storage"
@@ -296,7 +296,7 @@ sqlalchemy = "^2.0.0"
 
 [package.source]
 type = "directory"
-url = "packages/alphaloop-storage"
+url = "infrastructure/alphaloop-storage"
 
 [[package]]
 name = "annotated-types"
@@ -2998,4 +2998,4 @@ propcache = ">=0.2.1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.12,<4.0"
-content-hash = "ae35232301fc48516ae8d833dc159e85157850b004285810d05818c8c84e4f24"
+content-hash = "3f673a201c0e1092a7d87ef20353d5430fb3a2988ec0d606309e3be01c6661a2"

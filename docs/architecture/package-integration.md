@@ -18,11 +18,11 @@ psutil = "^5.9"          # Direct system monitoring
 ### ✅ **After: Official Package Dependencies**
 ```toml
 # pyproject.toml - Official packages
-alphaloop-heartbeat = {path = "packages/alphaloop-heartbeat"}
-alphaloop-security = {path = "packages/alphaloop-security"}
-alphaloop-logging = {path = "packages/alphaloop-logging"}
-alphaloop-storage = {path = "packages/alphaloop-storage"}
-alphaloop-cache = {path = "packages/alphaloop-cache"}
+alphaloop-heartbeat = {path = "infrastructure/alphaloop-heartbeat"}
+alphaloop-security = {path = "infrastructure/alphaloop-security"}
+alphaloop-logging = {path = "infrastructure/alphaloop-logging"}
+alphaloop-storage = {path = "infrastructure/alphaloop-storage"}
+alphaloop-cache = {path = "infrastructure/alphaloop-cache"}
 ```
 
 ## Package Integration Architecture

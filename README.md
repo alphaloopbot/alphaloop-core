@@ -148,7 +148,7 @@ alphaloop-core/
 │       ├── utils/               # Shared utilities
 │       ├── exceptions/          # Exception hierarchy
 │       └── types/               # Custom types & enums
-├── packages/                     # Reusable libraries
+├── infrastructure/              # Infrastructure packages
 │   ├── alphaloop-heartbeat/     # Health monitoring
 │   ├── alphaloop-security/      # Encryption & authentication
 │   ├── alphaloop-logging/       # Advanced logging with Telegram
