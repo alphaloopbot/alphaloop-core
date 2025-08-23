@@ -57,21 +57,19 @@ async def test_heartbeat_checking():
         # Create settings
         settings = HeartbeatSettings()
         settings.heartbeat_directory = temp_dir
-        settings.check_interval_seconds = 5
-        settings.stale_multiplier = 2.0
+        settings.default_timeout_seconds = 30
 
         # Create checker
         checker = HeartbeatChecker(settings)
 
-        print(f"📁 Monitoring directory: {checker._heartbeat_dir}")
-        print(f"⏱️  Check interval: {checker._check_interval}s")
-        print(f"🔍 Stale multiplier: {settings.stale_multiplier}")
+        print(f"📁 Monitoring directory: {settings.heartbeat_directory}")
+        print(f"⏱️  Default timeout: {settings.default_timeout_seconds}s")
 
         # Create a test heartbeat file
         test_file = Path(temp_dir) / "test-service.json"
         test_content = """{
   "service_name": "test-service",
-  "timestamp": "2024-01-01T12:00:00.000000",
+  "timestamp": 1755981887.0,
   "status": "healthy",
   "version": "1.0.0",
   "interval_seconds": 30
@@ -82,8 +80,13 @@ async def test_heartbeat_checking():
 
         print(f"📄 Created test heartbeat file: {test_file.name}")
 
-        # Check the heartbeat
-        await checker._check_single_heartbeat(test_file)
+        # Check the heartbeat using the public API
+        health_status = await checker.check_service_health("test-service")
+
+        print(f"🔍 Health status: {health_status['healthy']}")
+        print(f"📊 Age seconds: {health_status['age_seconds']}")
+        if health_status["error"]:
+            print(f"❌ Error: {health_status['error']}")
 
         print("✅ Heartbeat checking test completed\n")
 
