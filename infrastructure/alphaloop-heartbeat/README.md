@@ -353,7 +353,7 @@ poetry run pytest
 poetry run pytest --cov=alphaloop_heartbeat
 
 # Run specific test
-poetry run pytest tests/test_heartbeat_generator.py -v
+poetry run pytest tests/test_heartbeat_basic.py -v
 ```
 
 ## 📈 Performance

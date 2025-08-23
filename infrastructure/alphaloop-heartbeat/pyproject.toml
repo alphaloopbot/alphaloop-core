@@ -80,3 +80,4 @@ addopts = [
     "--strict-markers",
     "--strict-config"
 ]
+asyncio_mode = "auto"
