@@ -17,9 +17,9 @@ services:
       - /proc:/proc:ro
       - /sys:/sys:ro
       - ${ALPHALOOP_HOME}/logs/:/app/logs/
-    depends_on:
-      alphaloop-database:
-        condition: service_healthy
+    # depends_on:
+    #   alphaloop-database:
+    #     condition: service_healthy
     healthcheck:
       test: ["CMD", "python", "-c", "import psutil; print('OK')"]
       interval: 30s

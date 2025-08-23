@@ -22,9 +22,9 @@ services:
       - ${ALPHALOOP_HOME}/cache/:/app/cache/
     ports:
       - "8001:8000"
-    depends_on:
-      alphaloop-database:
-        condition: service_healthy
+    # depends_on:
+    #   alphaloop-database:
+    #     condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s

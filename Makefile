@@ -268,7 +268,7 @@ services-health-check: ## Check health of all running services
 
 services-setup-env: ## Setup environment files for all services
 	@echo "⚙️ Setting up environment files..."
-	@cd services && mkdir -p ${ALPHALOOP_HOME:-/opt/alphaloop}/{postgres_db,logs,cache}
+	@cd services && mkdir -p ${ALPHALOOP_HOME:-$(shell pwd)/services/data}/{postgres_db,logs,cache}
 	@cd services && [ ! -f "alphaloop-database/.env" ] && cp alphaloop-database/env.example alphaloop-database/.env && echo "✅ Created alphaloop-database/.env"
 	@cd services && [ ! -f "alphaloop-system-metrics/.env" ] && cp alphaloop-system-metrics/env.example alphaloop-system-metrics/.env && echo "✅ Created alphaloop-system-metrics/.env"
 	@cd services && [ ! -f "alphaloop-market-data/.env.local" ] && cp alphaloop-market-data/env.example.local alphaloop-market-data/.env.local && echo "✅ Created alphaloop-market-data/.env.local"

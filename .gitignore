@@ -189,3 +189,6 @@ output/
 
 # Legacy code (should not be committed)
 legacy/
+
+# Service data
+services/data/
