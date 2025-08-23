@@ -2,7 +2,6 @@
 
 import pytest
 from alphaloop_security.auth import ConnectionAuthenticator
-from alphaloop_security.exceptions import UnauthorizedRequestError
 
 
 class TestConnectionAuthenticator:
@@ -14,82 +13,119 @@ class TestConnectionAuthenticator:
             passphrase="test-passphrase", period_size=5, num_sequential_hashes=3
         )
 
-        assert auth.passphrase == "test-passphrase"
+        assert auth.passphrase == b"test-passphrase"
         assert auth.period_size == 5
         assert auth.num_sequential_hashes == 3
 
-    def test_hash_generation(self):
-        """Test hash generation."""
+    def test_token_generation(self):
+        """Test token generation."""
         auth = ConnectionAuthenticator(
             passphrase="test-passphrase", period_size=5, num_sequential_hashes=3
         )
 
-        hash_value = auth.hash
-        assert isinstance(hash_value, str)
-        assert len(hash_value) == 16
+        token = auth.generate_token()
+        assert isinstance(token, str)
+        assert len(token) > 0
 
-    def test_sequential_hashes(self):
-        """Test sequential hash generation."""
+    def test_token_validation(self):
+        """Test token validation."""
         auth = ConnectionAuthenticator(
             passphrase="test-passphrase", period_size=5, num_sequential_hashes=3
         )
 
-        hashes = auth.sequential_hashes
-        assert len(hashes) == 3
-        assert all(isinstance(h, str) for h in hashes)
-        assert all(len(h) == 16 for h in hashes)
+        # Generate a valid token
+        token = auth.generate_token()
 
-    def test_valid_hash_check(self):
-        """Test valid hash validation."""
+        # Validate the token
+        is_valid = auth.validate_token(token)
+        assert is_valid is True
+
+    def test_invalid_token_validation(self):
+        """Test invalid token validation."""
         auth = ConnectionAuthenticator(
             passphrase="test-passphrase", period_size=5, num_sequential_hashes=3
         )
 
-        current_hash = auth.hash
-        auth.check(current_hash)  # Should not raise
+        # Test with invalid token
+        is_valid = auth.validate_token("invalid-token")
+        assert is_valid is False
 
-    def test_invalid_hash_check(self):
-        """Test invalid hash validation."""
+    def test_token_info(self):
+        """Test token info extraction."""
         auth = ConnectionAuthenticator(
             passphrase="test-passphrase", period_size=5, num_sequential_hashes=3
         )
 
-        with pytest.raises(UnauthorizedRequestError):
-            auth.check("invalid-hash-value")
+        # Generate a token
+        token = auth.generate_token()
 
-    def test_is_valid_method(self):
-        """Test is_valid method."""
+        # Get token info
+        info = auth.get_token_info(token)
+        assert info is not None
+        assert "period" in info
+        assert "hash" in info
+        assert info["period_size"] == 5
+        assert info["num_sequential_hashes"] == 3
+
+    def test_invalid_token_info(self):
+        """Test token info with invalid token."""
         auth = ConnectionAuthenticator(
             passphrase="test-passphrase", period_size=5, num_sequential_hashes=3
         )
 
-        current_hash = auth.hash
-        assert auth.is_valid(current_hash) is True
-        assert auth.is_valid("invalid-hash") is False
+        # Test with invalid token
+        info = auth.get_token_info("invalid-token")
+        assert info is None
 
-    def test_hash_time_consistency(self):
-        """Test that hash generation is consistent within the same period."""
+    def test_custom_period_token(self):
+        """Test token generation with custom period."""
         auth = ConnectionAuthenticator(
             passphrase="test-passphrase", period_size=5, num_sequential_hashes=3
         )
 
-        hash1 = auth.get_hash_time(0)
-        hash2 = auth.get_hash_time(0)
-        assert hash1 == hash2
+        # Generate token for specific period
+        custom_period = 12345
+        token = auth.generate_token(custom_period=custom_period)
 
-    def test_different_periods(self):
-        """Test that different periods generate different hashes."""
+        # Get token info to verify period
+        info = auth.get_token_info(token)
+        assert info is not None
+        assert info["period"] == custom_period
+
+    def test_tolerance_periods(self):
+        """Test token validation with tolerance periods."""
         auth = ConnectionAuthenticator(
             passphrase="test-passphrase", period_size=5, num_sequential_hashes=3
         )
 
-        current_hash = auth.get_hash_time(0)
-        previous_hash = auth.get_hash_time(1)
+        # Generate a token
+        token = auth.generate_token()
 
-        # These might be the same if we're at the boundary of a period
-        # but they should be different in most cases
-        # We'll just test that the method works
-        assert isinstance(current_hash, str)
-        assert isinstance(previous_hash, str)
-        assert len(current_hash) == 16
-        assert len(previous_hash) == 16
+        # Validate with different tolerance levels
+        assert auth.validate_token(token, tolerance_periods=0) is True
+        assert auth.validate_token(token, tolerance_periods=1) is True
+        assert auth.validate_token(token, tolerance_periods=2) is True
+
+    def test_empty_passphrase_validation(self):
+        """Test that empty passphrase raises ValueError."""
+        with pytest.raises(ValueError, match="passphrase cannot be empty"):
+            ConnectionAuthenticator(passphrase="", period_size=5)
+
+        with pytest.raises(ValueError, match="passphrase cannot be empty"):
+            ConnectionAuthenticator(passphrase="   ", period_size=5)
+
+    def test_invalid_period_size(self):
+        """Test that invalid period size raises ValueError."""
+        with pytest.raises(ValueError, match="period_size must be positive"):
+            ConnectionAuthenticator(passphrase="test", period_size=0)
+
+        with pytest.raises(ValueError, match="period_size must be positive"):
+            ConnectionAuthenticator(passphrase="test", period_size=-1)
+
+    def test_invalid_sequential_hashes(self):
+        """Test that invalid sequential hashes raises ValueError."""
+        with pytest.raises(ValueError, match="num_sequential_hashes must be positive"):
+            ConnectionAuthenticator(passphrase="test", num_sequential_hashes=0)
+
+        with pytest.raises(ValueError, match="num_sequential_hashes must be positive"):
+            ConnectionAuthenticator(passphrase="test", num_sequential_hashes=-1)
