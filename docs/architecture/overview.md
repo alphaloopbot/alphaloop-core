@@ -66,11 +66,7 @@ Health monitoring and status checking for distributed systems.
 #### alphaloop-logging
 Centralized logging with multiple output handlers and formatting.
 
-#### alphaloop-database
-Database abstractions, connection management, and migration tools.
 
-#### alphaloop-data
-Data processing, feature engineering, and statistical analysis utilities.
 
 ## Data Flow
 

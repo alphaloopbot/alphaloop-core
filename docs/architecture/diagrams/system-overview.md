@@ -199,8 +199,8 @@ graph TB
     subgraph "Packages"
         AH[alphaloop-heartbeat<br/>Health Monitoring]
         AL[alphaloop-logging<br/>Logging & Reporting]
-        AD[alphaloop-database<br/>Database Abstractions]
-        ADATA[alphaloop-data<br/>Data Processing]
+        AS[alphaloop-storage<br/>Data Storage]
+        AC[alphaloop-cache<br/>Caching & Pub/Sub]
     end
 
     subgraph "Services"
@@ -218,13 +218,13 @@ graph TB
 
     AH --> SHARED
     AL --> SHARED
-    AD --> SHARED
-    ADATA --> SHARED
+    AS --> SHARED
+    AC --> SHARED
 
-    DB_SVC --> AD
+    DB_SVC --> AS
     METRICS_SVC --> AH
     METRICS_SVC --> AL
-    MARKET_SVC --> ADATA
+    MARKET_SVC --> AS
     MARKET_SVC --> AL
 
     %% Styling
@@ -233,7 +233,7 @@ graph TB
     classDef service fill:#99ff99
 
     class DOMAIN,APP,INFRA,SHARED core
-    class AH,AL,AD,ADATA package
+    class AH,AL,AS,AC package
     class DB_SVC,METRICS_SVC,MARKET_SVC service
 ```
 
