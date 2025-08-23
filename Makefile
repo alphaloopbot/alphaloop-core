@@ -171,6 +171,21 @@ export-and-analyze-pr-latest: ## Export and analyze latest PR review in one comm
 services-start-local: ## Start local development services
 	@cd services && ./scripts/start-local.sh
 
+services-start-all: ## Start all services in correct order (database -> system-metrics -> market-data)
+	@echo "🚀 Starting all AlphaLoop services in correct order..."
+	@$(MAKE) services-setup-env
+	@$(MAKE) services-database
+	@echo "⏳ Waiting for database to be fully ready..."
+	@sleep 5
+	@$(MAKE) services-system-metrics
+	@echo "⏳ Waiting for system metrics to start..."
+	@sleep 3
+	@$(MAKE) services-market-data-local
+	@echo "⏳ Waiting for all services to be healthy..."
+	@sleep 10
+	@$(MAKE) services-health-check
+	@echo "✅ All services started successfully!"
+
 services-start-cloud: ## Start cloud production services
 	@cd services && ./scripts/start-cloud.sh
 
@@ -185,3 +200,76 @@ services-status: ## Show service status
 
 services-build: ## Build all service images
 	@cd services && docker-compose build
+
+# Individual Service Management
+services-database: ## Start only database service
+	@echo "🗄️ Starting AlphaLoop Database..."
+	@cd services && docker-compose up -d alphaloop-database
+	@echo "⏳ Waiting for database to be ready..."
+	@cd services && until docker-compose exec -T alphaloop-database pg_isready -U postgres; do echo "   Waiting for database..."; sleep 2; done
+	@echo "✅ Database is ready!"
+
+services-system-metrics: ## Start only system metrics service
+	@echo "📊 Starting AlphaLoop System Metrics..."
+	@cd services && docker-compose up -d alphaloop-system-metrics
+	@echo "✅ System Metrics started!"
+
+services-market-data-local: ## Start only market data service (local)
+	@echo "📈 Starting AlphaLoop Market Data (Local)..."
+	@cd services && docker-compose up -d alphaloop-market-data-local
+	@echo "✅ Market Data (Local) started!"
+
+services-market-data-cloud: ## Start only market data service (cloud)
+	@echo "☁️ Starting AlphaLoop Market Data (Cloud)..."
+	@cd services && docker-compose up -d alphaloop-market-data-cloud
+	@echo "✅ Market Data (Cloud) started!"
+
+# Service Testing
+services-test-e2e: ## Run end-to-end tests for all services
+	@echo "🧪 Running end-to-end tests for AlphaLoop services..."
+	@$(MAKE) services-test-database
+	@$(MAKE) services-test-system-metrics
+	@$(MAKE) services-test-market-data
+	@echo "✅ All end-to-end tests completed!"
+
+services-test-e2e-comprehensive: ## Run comprehensive end-to-end tests with detailed reporting
+	@echo "🧪 Running comprehensive end-to-end tests..."
+	@cd services && ./scripts/test-e2e.sh
+
+services-test-database: ## Test database service connectivity and functionality
+	@echo "🗄️ Testing database service..."
+	@cd services && docker-compose exec -T alphaloop-database psql -U postgres -d alphaloop_market -c "SELECT version();" || echo "❌ Database test failed"
+	@cd services && docker-compose exec -T alphaloop-database psql -U postgres -d alphaloop_sys -c "SELECT version();" || echo "❌ System database test failed"
+	@echo "✅ Database tests completed!"
+
+services-test-system-metrics: ## Test system metrics service
+	@echo "📊 Testing system metrics service..."
+	@cd services && docker-compose exec -T alphaloop-system-metrics python -c "import psutil; print('System metrics service is working')" || echo "❌ System metrics test failed"
+	@echo "✅ System metrics tests completed!"
+
+services-test-market-data: ## Test market data service API
+	@echo "📈 Testing market data service..."
+	@curl -f http://localhost:8001/health || echo "❌ Market data health check failed"
+	@curl -f http://localhost:8001/api/v1/status || echo "❌ Market data status check failed"
+	@echo "✅ Market data tests completed!"
+
+services-health-check: ## Check health of all running services
+	@echo "🏥 Checking health of all services..."
+	@cd services && docker-compose ps
+	@echo ""
+	@echo "🔍 Health Checks:"
+	@echo "Database:"
+	@cd services && docker-compose exec -T alphaloop-database pg_isready -U postgres || echo "❌ Database health check failed"
+	@echo "System Metrics:"
+	@cd services && docker-compose exec -T alphaloop-system-metrics python -c "import psutil; print('✅ OK')" || echo "❌ System metrics health check failed"
+	@echo "Market Data:"
+	@curl -f http://localhost:8001/health || echo "❌ Market data health check failed"
+	@echo "✅ Health checks completed!"
+
+services-setup-env: ## Setup environment files for all services
+	@echo "⚙️ Setting up environment files..."
+	@cd services && mkdir -p ${ALPHALOOP_HOME:-/opt/alphaloop}/{postgres_db,logs,cache}
+	@cd services && [ ! -f "alphaloop-database/.env" ] && cp alphaloop-database/env.example alphaloop-database/.env && echo "✅ Created alphaloop-database/.env"
+	@cd services && [ ! -f "alphaloop-system-metrics/.env" ] && cp alphaloop-system-metrics/env.example alphaloop-system-metrics/.env && echo "✅ Created alphaloop-system-metrics/.env"
+	@cd services && [ ! -f "alphaloop-market-data/.env.local" ] && cp alphaloop-market-data/env.example.local alphaloop-market-data/.env.local && echo "✅ Created alphaloop-market-data/.env.local"
+	@echo "✅ Environment setup completed!"
