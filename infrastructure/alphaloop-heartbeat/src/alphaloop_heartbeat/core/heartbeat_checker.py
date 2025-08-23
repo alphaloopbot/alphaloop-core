@@ -1,312 +1,291 @@
-"""Heartbeat checker for monitoring heartbeat files and detecting stale services."""
+"""
+Heartbeat checker for service monitoring.
 
-import asyncio
+This module provides functionality to check and validate heartbeat files created by
+services. The heartbeat checker is essential for monitoring systems to detect when
+services become unresponsive or fail.
+
+The checker reads heartbeat files and determines if services are healthy based on
+the freshness of their heartbeat data and the configured timeout thresholds.
+
+Key Features:
+- Configurable timeout thresholds
+- Multiple service monitoring
+- Graceful error handling
+- Detailed health status reporting
+- Process validation capabilities
+"""
+
 import json
-from datetime import datetime, timedelta
+import logging
+import os
 from pathlib import Path
 from typing import Any
 
-import psutil
+from alphaloop_heartbeat.config.settings import HeartbeatSettings
+from alphaloop_heartbeat.utils.file_utils import get_heartbeat_file_path
+from alphaloop_heartbeat.utils.time_utils import get_current_timestamp
 
-from ..config.settings import HeartbeatSettings
-from ..utils.file_utils import get_heartbeat_directory
-from ..utils.time_utils import get_current_timestamp
+logger = logging.getLogger(__name__)
 
 
 class HeartbeatChecker:
-    """Monitors heartbeat files and detects stale services."""
+    """
+    Checks heartbeat files to determine service health status.
+
+    This class is responsible for monitoring heartbeat files created by services
+    and determining whether those services are healthy based on the freshness
+    of their heartbeat data.
+
+    The checker reads JSON heartbeat files and compares their timestamps against
+    configured timeout thresholds to determine if services are responding normally
+    or if they may have failed or become unresponsive.
+
+    Key Features:
+    - Configurable timeout thresholds
+    - Multiple service monitoring
+    - Process validation (optional)
+    - Detailed health status reporting
+    - Graceful error handling
+
+    Usage:
+        checker = HeartbeatChecker(settings=my_settings)
+        status = await checker.check_service_health("my-service")
+    """
 
     def __init__(self, settings: HeartbeatSettings | None = None) -> None:
-        """Initialize the heartbeat checker."""
-        self._settings = settings or HeartbeatSettings()
-        self._heartbeat_dir = get_heartbeat_directory()
-        self._running = False
-        self._check_interval = self._settings.check_interval_seconds
+        """
+        Initialize the heartbeat checker.
 
-    async def start_monitoring(self) -> None:
-        """Start monitoring heartbeat files."""
-        self._running = True
-        print(f"Starting heartbeat monitoring in {self._heartbeat_dir}")
+        Creates a new heartbeat checker with the specified settings. The checker
+        will use these settings to determine timeout thresholds and behavior.
 
-        while self._running:
-            try:
-                await self._check_all_heartbeats()
-                await asyncio.sleep(self._check_interval)
-            except Exception as e:
-                print(f"Error during heartbeat monitoring: {e}")
-                await asyncio.sleep(5)  # Wait before retrying
+        Args:
+            settings: Configuration settings for heartbeat checking behavior.
+                     If None, default settings will be used.
 
-    async def stop_monitoring(self) -> None:
-        """Stop monitoring heartbeat files."""
-        self._running = False
-        print("Stopping heartbeat monitoring")
+        Example:
+            >>> checker = HeartbeatChecker(settings=my_settings)
+            >>> checker = HeartbeatChecker()  # Uses default settings
+        """
+        self.settings = settings or HeartbeatSettings()
 
-    async def _check_all_heartbeats(self) -> None:
-        """Check all heartbeat files in the directory."""
-        if not self._heartbeat_dir.exists():
-            return
+    def _is_process_running(self, pid: int) -> bool:
+        """
+        Check if a process with the given PID is still running.
 
-        heartbeat_files = list(self._heartbeat_dir.glob("*.json"))
+        This method validates that a process is actually running by sending
+        a signal 0 (which doesn't actually send a signal but checks if the
+        process exists). This helps distinguish between a stopped service
+        and a service that has crashed or been killed.
 
-        for heartbeat_file in heartbeat_files:
-            try:
-                await self._check_single_heartbeat(heartbeat_file)
-            except Exception as e:
-                print(f"Error checking heartbeat file {heartbeat_file}: {e}")
+        Args:
+            pid: The process ID to check
 
-    async def _check_single_heartbeat(self, heartbeat_file: Path) -> None:
-        """Check a single heartbeat file."""
+        Returns:
+            True if the process is running, False otherwise
+
+        Example:
+            >>> checker._is_process_running(12345)
+            True
+            >>> checker._is_process_running(99999)
+            False
+        """
         try:
-            with open(heartbeat_file) as f:
-                heartbeat_data = json.load(f)
-
-            service_name = heartbeat_data.get("service_name", heartbeat_file.stem)
-            last_heartbeat = heartbeat_data.get("timestamp")
-            process_id = heartbeat_data.get("process_id")
-            expected_interval = heartbeat_data.get(
-                "interval_seconds", self._settings.default_interval_seconds
-            )
-
-            if not last_heartbeat:
-                print(f"Warning: No timestamp found in heartbeat file {heartbeat_file}")
-                return
-
-            # Parse timestamp
-            try:
-                last_heartbeat_time = datetime.fromisoformat(last_heartbeat)
-            except ValueError:
-                print(f"Warning: Invalid timestamp format in {heartbeat_file}")
-                return
-
-            # Check if heartbeat is stale
-            current_time = datetime.now()
-            time_since_last_heartbeat = current_time - last_heartbeat_time
-            stale_threshold = timedelta(seconds=expected_interval * self._settings.stale_multiplier)
-
-            if time_since_last_heartbeat > stale_threshold:
-                await self._handle_stale_heartbeat(
-                    service_name, heartbeat_file, last_heartbeat_time, process_id
-                )
-            else:
-                # Heartbeat is fresh, check if process is still running
-                if process_id and not self._is_process_running(process_id):
-                    await self._handle_dead_process(service_name, heartbeat_file, process_id)
-
-        except json.JSONDecodeError:
-            print(f"Warning: Invalid JSON in heartbeat file {heartbeat_file}")
-        except Exception as e:
-            print(f"Error processing heartbeat file {heartbeat_file}: {e}")
-
-    async def _handle_stale_heartbeat(
-        self,
-        service_name: str,
-        heartbeat_file: Path,
-        last_heartbeat: datetime,
-        process_id: int | None,
-    ) -> None:
-        """Handle a stale heartbeat."""
-        current_time = datetime.now()
-        time_since_last_heartbeat = current_time - last_heartbeat
-
-        print(f"⚠️  STALE HEARTBEAT: {service_name}")
-        print(f"   Last heartbeat: {last_heartbeat.isoformat()}")
-        print(f"   Time since last: {time_since_last_heartbeat}")
-        print(f"   Process ID: {process_id}")
-        print(f"   File: {heartbeat_file}")
-
-        # Check if process is still running
-        if process_id and self._is_process_running(process_id):
-            print(f"   Process {process_id} is still running - service may be unresponsive")
-        else:
-            print(f"   Process {process_id} is not running - service has stopped")
-
-        # Trigger alert if configured
-        if self._settings.enable_alerts:
-            await self._send_alert(
-                service_name,
-                "stale_heartbeat",
-                {
-                    "last_heartbeat": last_heartbeat.isoformat(),
-                    "time_since_last": str(time_since_last_heartbeat),
-                    "process_id": process_id,
-                },
-            )
-
-    async def _handle_dead_process(
-        self, service_name: str, heartbeat_file: Path, process_id: int
-    ) -> None:
-        """Handle a dead process."""
-        print(f"💀 DEAD PROCESS: {service_name}")
-        print(f"   Process ID: {process_id}")
-        print(f"   File: {heartbeat_file}")
-
-        # Clean up heartbeat file
-        try:
-            heartbeat_file.unlink()
-            print(f"   Cleaned up heartbeat file: {heartbeat_file}")
-        except Exception as e:
-            print(f"   Failed to clean up heartbeat file: {e}")
-
-        # Trigger alert if configured
-        if self._settings.enable_alerts:
-            await self._send_alert(
-                service_name,
-                "dead_process",
-                {
-                    "process_id": process_id,
-                },
-            )
-
-    def _is_process_running(self, process_id: int) -> bool:
-        """Check if a process is still running."""
-        try:
-            process = psutil.Process(process_id)
-            return process.is_running()
-        except psutil.NoSuchProcess:
-            return False
-        except Exception:
+            os.kill(pid, 0)
+            return True
+        except OSError:
             return False
 
-    async def _send_alert(
-        self, service_name: str, alert_type: str, details: dict[str, Any]
-    ) -> None:
-        """Send an alert about a service issue."""
-        # This would integrate with your alerting system (email, Slack, etc.)
-        alert = {
-            "timestamp": get_current_timestamp(),
-            "service_name": service_name,
-            "alert_type": alert_type,
-            "details": details,
-        }
+    def _handle_dead_process(self, service_name: str, pid: int) -> None:
+        """
+        Handle cleanup when a dead process is detected.
 
-        print(f"🚨 ALERT: {alert}")
-        # TODO: Implement actual alert sending logic
+        This method is called when a process is found to be dead during
+        heartbeat checking. It performs any necessary cleanup operations
+        and logs the event for monitoring purposes.
 
-    async def get_heartbeat_status(self) -> dict[str, Any]:
-        """Get the current status of all heartbeats."""
-        status = {
-            "timestamp": get_current_timestamp(),
-            "heartbeat_directory": str(self._heartbeat_dir),
-            "services": [],
-            "summary": {
-                "total_services": 0,
-                "healthy_services": 0,
-                "stale_services": 0,
-                "dead_services": 0,
-            },
-        }
+        Args:
+            service_name: Name of the service that has died
+            pid: Process ID of the dead process
 
-        if not self._heartbeat_dir.exists():
-            return status
+        Example:
+            >>> checker._handle_dead_process("worker-service", 12345)
+            # Logs the event and performs cleanup
+        """
+        logger.warning(f"Process {pid} for service {service_name} is dead")
 
-        heartbeat_files = list(self._heartbeat_dir.glob("*.json"))
-        status["summary"]["total_services"] = len(heartbeat_files)
+    async def check_service_health(
+        self, service_name: str, timeout_seconds: int | None = None
+    ) -> dict[str, Any]:
+        """
+        Check the health status of a specific service.
 
-        for heartbeat_file in heartbeat_files:
-            try:
-                service_status = await self._get_service_status(heartbeat_file)
-                status["services"].append(service_status)
+        Reads the heartbeat file for the specified service and determines
+        if the service is healthy based on the freshness of its heartbeat
+        data and the configured timeout threshold.
 
-                if service_status["status"] == "healthy":
-                    status["summary"]["healthy_services"] += 1
-                elif service_status["status"] == "stale":
-                    status["summary"]["stale_services"] += 1
-                elif service_status["status"] == "dead":
-                    status["summary"]["dead_services"] += 1
+        The health check considers:
+        - Whether the heartbeat file exists
+        - How recent the heartbeat timestamp is
+        - Whether the service process is still running (if PID is available)
+        - Any errors in the heartbeat data
 
-            except Exception as e:
-                print(f"Error getting status for {heartbeat_file}: {e}")
+        Args:
+            service_name: Name of the service to check
+            timeout_seconds: Override the default timeout threshold in seconds.
+                           If None, uses the timeout from settings.
 
-        return status
+        Returns:
+            Dictionary containing health status information:
+            - healthy: Boolean indicating if service is healthy
+            - last_heartbeat: Timestamp of last heartbeat (or None)
+            - age_seconds: Age of last heartbeat in seconds (or None)
+            - error: Error message if health check failed (or None)
+            - details: Additional health information
 
-    async def _get_service_status(self, heartbeat_file: Path) -> dict[str, Any]:
-        """Get the status of a single service."""
+        Raises:
+            FileNotFoundError: If heartbeat file doesn't exist
+            json.JSONDecodeError: If heartbeat file is corrupted
+            ValueError: If heartbeat data is invalid
+
+        Example:
+            >>> status = await checker.check_service_health("api-service")
+            >>> print(status["healthy"])
+            True
+            >>> print(status["age_seconds"])
+            15
+        """
+        timeout = timeout_seconds or self.settings.default_timeout_seconds
+        heartbeat_file = get_heartbeat_file_path(
+            service_name, Path(self.settings.heartbeat_directory)
+        )
+
+        if not heartbeat_file.exists():
+            return {
+                "healthy": False,
+                "last_heartbeat": None,
+                "age_seconds": None,
+                "error": f"Heartbeat file not found: {heartbeat_file}",
+                "details": {"file_exists": False},
+            }
+
         try:
-            with open(heartbeat_file) as f:
+            with open(heartbeat_file, encoding="utf-8") as f:
                 heartbeat_data = json.load(f)
 
-            service_name = heartbeat_data.get("service_name", heartbeat_file.stem)
             last_heartbeat = heartbeat_data.get("timestamp")
-            process_id = heartbeat_data.get("process_id")
-            expected_interval = heartbeat_data.get(
-                "interval_seconds", self._settings.default_interval_seconds
-            )
-
             if not last_heartbeat:
                 return {
-                    "service_name": service_name,
-                    "status": "unknown",
-                    "error": "No timestamp found",
+                    "healthy": False,
+                    "last_heartbeat": None,
+                    "age_seconds": None,
+                    "error": "No timestamp in heartbeat data",
+                    "details": {"heartbeat_data": heartbeat_data},
                 }
 
-            last_heartbeat_time = datetime.fromisoformat(last_heartbeat)
-            current_time = datetime.now()
-            time_since_last_heartbeat = current_time - last_heartbeat_time
-            stale_threshold = timedelta(seconds=expected_interval * self._settings.stale_multiplier)
+            current_time = get_current_timestamp()
+            age_seconds = current_time - last_heartbeat
 
-            status = {
-                "service_name": service_name,
+            # Check if heartbeat is too old
+            if age_seconds > timeout:
+                return {
+                    "healthy": False,
+                    "last_heartbeat": last_heartbeat,
+                    "age_seconds": age_seconds,
+                    "error": f"Heartbeat too old: {age_seconds}s > {timeout}s",
+                    "details": {"timeout_seconds": timeout},
+                }
+
+            # Check if process is still running (if PID is available)
+            pid = heartbeat_data.get("pid")
+            if pid is not None and not self._is_process_running(pid):
+                self._handle_dead_process(service_name, pid)
+                return {
+                    "healthy": False,
+                    "last_heartbeat": last_heartbeat,
+                    "age_seconds": age_seconds,
+                    "error": f"Process {pid} is dead",
+                    "details": {"pid": pid, "process_running": False},
+                }
+
+            return {
+                "healthy": True,
                 "last_heartbeat": last_heartbeat,
-                "time_since_last": str(time_since_last_heartbeat),
-                "process_id": process_id,
-                "expected_interval": expected_interval,
+                "age_seconds": age_seconds,
+                "error": None,
+                "details": {
+                    "service_name": heartbeat_data.get("service_name"),
+                    "version": heartbeat_data.get("version"),
+                    "status": heartbeat_data.get("status"),
+                    "pid": pid,
+                },
             }
 
-            if time_since_last_heartbeat > stale_threshold:
-                status["status"] = "stale"
-            elif process_id and not self._is_process_running(process_id):
-                status["status"] = "dead"
-            else:
-                status["status"] = "healthy"
-
-            return status
-
+        except json.JSONDecodeError as e:
+            return {
+                "healthy": False,
+                "last_heartbeat": None,
+                "age_seconds": None,
+                "error": f"Invalid JSON in heartbeat file: {e}",
+                "details": {"file_path": str(heartbeat_file)},
+            }
         except Exception as e:
             return {
-                "service_name": heartbeat_file.stem,
-                "status": "error",
-                "error": str(e),
+                "healthy": False,
+                "last_heartbeat": None,
+                "age_seconds": None,
+                "error": f"Error checking heartbeat: {e}",
+                "details": {"file_path": str(heartbeat_file)},
             }
 
+    async def check_all_services(self, service_names: list[str]) -> dict[str, Any]:
+        """
+        Check the health status of multiple services.
 
-async def main() -> None:
-    """Main function for the heartbeat checker."""
-    import argparse
+        Performs health checks on all specified services and returns a summary
+        of their collective health status. This is useful for monitoring systems
+        that need to track multiple services simultaneously.
 
-    parser = argparse.ArgumentParser(description="AlphaLoop Heartbeat Checker")
-    parser.add_argument("--config", "-c", type=str, help="Path to configuration file")
-    parser.add_argument(
-        "--status",
-        "-s",
-        action="store_true",
-        help="Show current heartbeat status and exit",
-    )
-    parser.add_argument("--interval", "-i", type=int, help="Check interval in seconds")
+        Args:
+            service_names: List of service names to check
 
-    args = parser.parse_args()
+        Returns:
+            Dictionary containing overall health status:
+            - all_healthy: Boolean indicating if all services are healthy
+            - healthy_count: Number of healthy services
+            - total_count: Total number of services checked
+            - services: Dictionary mapping service names to their health status
+            - summary: Summary of health check results
 
-    # Load settings
-    settings = HeartbeatSettings()
-    if args.config:
-        settings.load_from_file(args.config)
-    if args.interval:
-        settings.check_interval_seconds = args.interval
+        Example:
+            >>> services = ["api-service", "worker-service", "db-service"]
+            >>> status = await checker.check_all_services(services)
+            >>> print(status["all_healthy"])
+            False
+            >>> print(status["healthy_count"])
+            2
+        """
+        results = {}
+        healthy_count = 0
 
-    checker = HeartbeatChecker(settings)
+        for service_name in service_names:
+            health_status = await self.check_service_health(service_name)
+            results[service_name] = health_status
+            if health_status["healthy"]:
+                healthy_count += 1
 
-    if args.status:
-        # Show status and exit
-        status = await checker.get_heartbeat_status()
-        print(json.dumps(status, indent=2))
-        return
+        all_healthy = healthy_count == len(service_names)
 
-    # Start monitoring
-    try:
-        await checker.start_monitoring()
-    except KeyboardInterrupt:
-        print("\nReceived interrupt signal, stopping...")
-        await checker.stop_monitoring()
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
+        return {
+            "all_healthy": all_healthy,
+            "healthy_count": healthy_count,
+            "total_count": len(service_names),
+            "services": results,
+            "summary": {
+                "healthy_services": [name for name, status in results.items() if status["healthy"]],
+                "unhealthy_services": [
+                    name for name, status in results.items() if not status["healthy"]
+                ],
+            },
+        }

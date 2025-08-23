@@ -1,4 +1,21 @@
-"""Heartbeat generator for service monitoring."""
+"""
+Heartbeat generator for service monitoring.
+
+This module provides the core functionality for generating heartbeat files that indicate
+service health and status. Heartbeats are essential for monitoring distributed systems
+and detecting when services become unresponsive or fail.
+
+The heartbeat generator creates timestamped JSON files that contain service status
+information, allowing monitoring systems to track service health and detect failures
+in real-time.
+
+Key Features:
+- Atomic file writes to prevent corruption
+- Configurable heartbeat intervals
+- Service name sanitization for security
+- Automatic directory creation
+- Graceful error handling and retry logic
+"""
 
 import asyncio
 import json
@@ -15,7 +32,30 @@ PACKAGE_VERSION = "0.1.0"
 
 
 def _sanitize_service_name(name: str) -> str:
-    """Sanitize user-supplied service names to safe filenames."""
+    """
+    Sanitize user-supplied service names to safe filenames.
+
+    This function ensures that service names are converted to safe filenames by:
+    - Removing path traversal attempts (../, etc.)
+    - Replacing unsafe characters with underscores
+    - Preventing directory traversal attacks
+    - Ensuring the filename is valid for the filesystem
+
+    Args:
+        name: The raw service name provided by the user
+
+    Returns:
+        A sanitized filename-safe string
+
+    Raises:
+        ValueError: If the service name is invalid or contains path traversal
+
+    Example:
+        >>> _sanitize_service_name("my-service")
+        'my-service'
+        >>> _sanitize_service_name("../../../etc/passwd")
+        ValueError: Invalid service_name
+    """
     base = os.path.basename(name.strip())
     if base in {"", ".", ".."}:
         raise ValueError("Invalid service_name")
@@ -29,7 +69,29 @@ logger = logging.getLogger(__name__)
 
 
 class HeartbeatGenerator:
-    """Generates heartbeat files for service monitoring."""
+    """
+    Generates heartbeat files for service monitoring.
+
+    This class is responsible for creating and maintaining heartbeat files that indicate
+    service health and status. Heartbeats are crucial for monitoring distributed systems
+    and detecting service failures in real-time.
+
+    The generator creates timestamped JSON files containing service information,
+    which can be monitored by external systems to detect when services become
+    unresponsive or fail.
+
+    Key Features:
+    - Configurable heartbeat intervals
+    - Atomic file writes to prevent corruption
+    - Automatic directory creation
+    - Graceful error handling
+    - Service name sanitization
+    - Version tracking
+
+    Usage:
+        generator = HeartbeatGenerator("my-service", interval=30)
+        await generator.start_generating()
+    """
 
     def __init__(
         self,
@@ -38,7 +100,29 @@ class HeartbeatGenerator:
         interval: int | None = None,
         version: str | None = None,
     ) -> None:
-        """Initialize the heartbeat generator."""
+        """
+        Initialize the heartbeat generator.
+
+        Creates a new heartbeat generator for the specified service. The generator
+        will create heartbeat files at regular intervals to indicate service health.
+
+        Args:
+            service_name: Name of the service to monitor. Will be sanitized for
+                         filesystem safety.
+            settings: Configuration settings for heartbeat behavior. If None,
+                     default settings will be used.
+            interval: Override the heartbeat interval in seconds. If None, uses
+                     the interval from settings.
+            version: Service version to include in heartbeat data. If None, uses
+                    the package version.
+
+        Raises:
+            ValueError: If interval is <= 0 or service_name is invalid
+
+        Example:
+            >>> generator = HeartbeatGenerator("api-service", interval=60)
+            >>> generator = HeartbeatGenerator("worker-service", settings=my_settings)
+        """
         self.service_name = _sanitize_service_name(service_name)
         self.settings = settings or HeartbeatSettings()
         self._running = False
@@ -53,7 +137,30 @@ class HeartbeatGenerator:
         self.version = version or PACKAGE_VERSION
 
     async def generate_heartbeat(self) -> None:
-        """Generate a heartbeat file for the service."""
+        """
+        Generate a heartbeat file for the service.
+
+        Creates a new heartbeat file with current timestamp and service status.
+        The file is written atomically to prevent corruption if the process
+        is interrupted during writing.
+
+        The heartbeat file contains:
+        - service_name: The name of the service
+        - timestamp: Current timestamp when heartbeat was generated
+        - status: Service status (always "healthy" for active heartbeats)
+        - version: Service version information
+
+        The file is written to the configured heartbeat directory with
+        the service name as the filename.
+
+        Raises:
+            OSError: If unable to write to the heartbeat directory
+            ValueError: If heartbeat data is invalid
+
+        Example:
+            >>> await generator.generate_heartbeat()
+            # Creates: /heartbeats/my-service.json
+        """
         import os
         from pathlib import Path
 
@@ -80,7 +187,29 @@ class HeartbeatGenerator:
         logger.debug("Heartbeat generated for %s", self.service_name)
 
     async def start_generating(self) -> None:
-        """Start generating heartbeats at regular intervals."""
+        """
+        Start generating heartbeats at regular intervals.
+
+        Begins the continuous heartbeat generation process. The generator will
+        create heartbeat files at the configured interval until stopped.
+
+        This method runs indefinitely until stop_generating() is called or
+        the task is cancelled. It includes error handling to ensure the
+        heartbeat generation continues even if individual heartbeats fail.
+
+        The generator will:
+        - Create heartbeat files at regular intervals
+        - Handle errors gracefully with retry logic
+        - Log heartbeat generation events
+        - Continue running until explicitly stopped
+
+        Raises:
+            asyncio.CancelledError: If the task is cancelled
+
+        Example:
+            >>> await generator.start_generating()
+            # Generates heartbeats every 60 seconds until stopped
+        """
         self._running = True
         logger.info(f"Starting heartbeat generation for {self.service_name}")
 
@@ -95,7 +224,19 @@ class HeartbeatGenerator:
                 await asyncio.sleep(5)  # Wait before retrying
 
     def stop_generating(self) -> None:
-        """Stop generating heartbeats."""
+        """
+        Stop generating heartbeats.
+
+        Signals the heartbeat generator to stop creating new heartbeat files.
+        The generator will complete its current heartbeat cycle and then stop.
+
+        This method is safe to call multiple times and can be called from
+        any thread or coroutine.
+
+        Example:
+            >>> generator.stop_generating()
+            # Heartbeat generation will stop after current cycle
+        """
         self._running = False
         logger.info(f"Stopped heartbeat generation for {self.service_name}")
 
