@@ -28,22 +28,19 @@ def load_environment() -> None:
 
 @lru_cache
 def get_database_url() -> str:
-    """Get the database URL from environment variables."""
-    load_environment()
+    """Get the database URL from environment variables (DEPRECATED: Use alphaloop-storage package)."""
+    import warnings
 
-    # Try to get from DATABASE_URL first
-    database_url = os.getenv("DATABASE_URL")
-    if database_url:
-        return database_url
+    warnings.warn(
+        "get_database_url() is deprecated. Use alphaloop_core.get_storage_config() instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
-    # Construct from individual components
-    host = os.getenv("DB_HOST", "localhost")
-    port = os.getenv("DB_PORT", "5432")
-    name = os.getenv("DB_NAME", "alphaloop")
-    user = os.getenv("DB_USER", "postgres")
-    password = os.getenv("DB_PASSWORD", "password")
+    from alphaloop_core import get_storage_config
 
-    return f"postgresql+asyncpg://{user}:{password}@{host}:{port}/{name}"
+    config = get_storage_config()
+    return config.async_url
 
 
 @lru_cache
