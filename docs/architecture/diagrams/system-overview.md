@@ -38,7 +38,9 @@ graph TB
     subgraph "Core Library"
         AL[AlphaLoop Core<br/>Library]
         AH[AlphaLoop<br/>Heartbeat]
-        AD[AlphaLoop<br/>Database]
+        ASEC[AlphaLoop<br/>Security]
+        AS[AlphaLoop<br/>Storage]
+        AC[AlphaLoop<br/>Cache]
         ALG[AlphaLoop<br/>Logging]
     end
 
@@ -63,9 +65,15 @@ graph TB
     AL --> CMD
     AL --> L1_MD
     AL --> L2_MD
-    AD --> CDB
-    AD --> L1_DB
-    AD --> L2_DB
+    AS --> CDB
+    AS --> L1_DB
+    AS --> L2_DB
+    AC --> CMD
+    AC --> L1_MD
+    AC --> L2_MD
+    ASEC --> CMD
+    ASEC --> L1_MD
+    ASEC --> L2_MD
     ALG --> CMD
     ALG --> L1_MD
     ALG --> L2_MD
@@ -79,7 +87,7 @@ graph TB
     class EX external
     class CDB,CMD,CAPI central
     class L1_MD,L1_DB,L2_MD,L2_DB local
-    class AL,AH,AD,ALG library
+    class AL,AH,ASEC,AS,AC,ALG library
 ```
 
 ## Data Flow Architecture
@@ -199,6 +207,7 @@ graph TB
     subgraph "Packages"
         AH[alphaloop-heartbeat<br/>Health Monitoring]
         AL[alphaloop-logging<br/>Logging & Reporting]
+        ASEC[alphaloop-security<br/>Encryption & Auth]
         AS[alphaloop-storage<br/>Data Storage]
         AC[alphaloop-cache<br/>Caching & Pub/Sub]
     end
@@ -218,6 +227,7 @@ graph TB
 
     AH --> SHARED
     AL --> SHARED
+    ASEC --> SHARED
     AS --> SHARED
     AC --> SHARED
 
@@ -233,7 +243,7 @@ graph TB
     classDef service fill:#99ff99
 
     class DOMAIN,APP,INFRA,SHARED core
-    class AH,AL,AS,AC package
+    class AH,AL,ASEC,AS,AC package
     class DB_SVC,METRICS_SVC,MARKET_SVC service
 ```
 
