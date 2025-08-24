@@ -4,7 +4,7 @@ from alphaloop_cache import CacheManager, PriceCache, PubSubManager
 from alphaloop_heartbeat import HeartbeatChecker, HeartbeatGenerator
 from alphaloop_logging import AlphaLoopLogger
 from alphaloop_security import ConnectionAuthenticator, DataEncryptor, SecureURLComposer
-from alphaloop_storage import DatabaseManager, SchemaManager, TableHandler
+from alphaloop_storage import DatabaseManager, TableHandler
 
 from .package_config import (
     get_cache_config,
@@ -77,10 +77,6 @@ class ServiceFactory:
         """Get or create table handler."""
         database_manager = await self.get_database_manager()
         return TableHandler(table_name, database_manager)
-
-    async def get_schema_manager(self) -> SchemaManager:
-        """Get or create schema manager."""
-        return SchemaManager()
 
     def get_authenticator(self) -> ConnectionAuthenticator:
         """Get connection authenticator."""

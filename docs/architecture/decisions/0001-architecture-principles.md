@@ -112,6 +112,32 @@ We will follow these core architectural axioms:
 - **Violation**: If domain code lacks tests, it's wrong
 - **Example**: Untested value object validation = ❌
 
+#### A16: **Schema Definition Single Source of Truth**
+- **Axiom**: Database schema definitions must be defined in YAML configuration files (`database_schema.yaml`) and generated dynamically. No hardcoded table structures in application code.
+- **Violation**: If table structures are hardcoded in application code instead of being derived from YAML schema, it's wrong
+- **Examples**:
+  - TableHandler with hardcoded column definitions = ❌
+  - SQL CREATE TABLE statements in application code = ❌
+  - YAML schema driving table creation dynamically = ✅
+  - Infrastructure packages reading YAML to generate schema = ✅
+- **Exceptions**:
+  - Test-specific mock schemas (when testing infrastructure in isolation)
+  - Migration scripts (when they need to reference specific schema versions)
+  - Documentation examples (when illustrating concepts)
+
+#### A17: **Single Source of Truth - No Derived Files**
+- **Axiom**: All configuration and schema information must have a single source of truth. No derived files should be created or maintained.
+- **Violation**: If information exists in multiple places or if files are generated from other files, it's wrong
+- **Examples**:
+  - SQL schema files generated from YAML = ❌
+  - Configuration duplicated in multiple files = ❌
+  - YAML schema as single source, SQL generated on-the-fly = ✅
+  - Environment variables as single source for configuration = ✅
+- **Exceptions**:
+  - Build artifacts (temporary files during compilation)
+  - Cache files (temporary performance optimizations)
+  - Log files (runtime output)
+
 ## Consequences
 
 ### Positive
@@ -141,6 +167,8 @@ Every PR must be checked against these axioms:
 - [ ] Cross-boundary calls go through ports; use events where async decoupling is desired (A13)
 - [ ] Tests are independent (A14)
 - [ ] Domain logic is tested (A15)
+- [ ] Schema definitions come from YAML, not hardcoded (A16)
+- [ ] Single source of truth maintained, no derived files (A17)
 
 ### Automated Checks
 We will implement automated checks for:

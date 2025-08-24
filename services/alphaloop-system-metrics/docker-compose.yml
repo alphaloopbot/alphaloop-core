@@ -9,7 +9,9 @@ services:
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       METRICS_INTERVAL: ${METRICS_INTERVAL:-30}
       SYSTEM_DATABASE: ${SYSTEM_DATABASE:-alphaloop_sys}
-    build: .
+    build:
+      context: ../..
+      dockerfile: services/alphaloop-system-metrics/Dockerfile
     env_file:
       - .env
     volumes:

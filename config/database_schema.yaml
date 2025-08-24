@@ -45,6 +45,7 @@ databases:
             type: "Float"
           - name: "swap_total"
             type: "Float"
+            nullable: true
           - name: "ssd_total"
             type: "Float"
         policies:
@@ -69,26 +70,34 @@ databases:
             type: "Integer"
           - name: "cpu_temperature"
             type: "Float"
+            nullable: true
           - name: "cpu_speed"
             type: "Integer"
+            nullable: true
           - name: "cpu_usage"
             type: "Float"
           - name: "cores_usage"
             type: "JSON"
+            nullable: true
           - name: "core_usage_max"
             type: "Float"
+            nullable: true
           - name: "core_usage_min"
             type: "Float"
+            nullable: true
           - name: "ram_usage"
             type: "Float"
           - name: "swap_usage"
             type: "Float"
+            nullable: true
           - name: "ssd_usage"
             type: "Float"
           - name: "ip_address"
             type: "String"
+            nullable: true
           - name: "ip_renewed"
             type: "Boolean"
+            nullable: true
         policies:
           local:
             tasks: ["DELETION", "BACKUP"]

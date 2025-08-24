@@ -236,6 +236,71 @@ services-test-e2e-comprehensive: ## Run comprehensive end-to-end tests with deta
 	@echo "🧪 Running comprehensive end-to-end tests..."
 	@cd services && ./scripts/test-e2e.sh
 
+# New Service Testing Commands
+services-build-test-images: ## Build test images for system metrics and market data services
+	@echo "🔨 Building test images for services..."
+	@echo "Building system metrics service..."
+	@docker build -f services/alphaloop-system-metrics/Dockerfile -t test-system-metrics .
+	@echo "Building market data service..."
+	@docker build -f services/alphaloop-market-data/Dockerfile -t test-market-data .
+	@echo "✅ Test images built successfully!"
+
+services-test-docker-e2e: ## Run comprehensive E2E tests for Docker services
+	@echo "🧪 Running comprehensive E2E tests for Docker services..."
+	@./scripts/test-services-e2e.sh
+
+services-test-system-metrics-docker: ## Test system metrics service in Docker
+	@echo "📊 Testing system metrics service in Docker..."
+	@docker run --rm test-system-metrics python -c "from alphaloop_core.services.system_metrics import SystemMetricsService; service = SystemMetricsService(); metrics = service.collect_metrics(); print(f'✅ Collected {len(metrics)} system metrics') if metrics else print('❌ Failed to collect metrics')"
+
+services-test-market-data-docker: ## Test market data service in Docker
+	@echo "📈 Testing market data service in Docker..."
+	@docker run --rm test-market-data python -c "from alphaloop_core.services.market_data import MarketDataService; service = MarketDataService(); data = service.get_mock_market_data(); print(f'✅ Generated {len(data)} market data records') if data else print('❌ Failed to generate market data')"
+
+services-test-infrastructure: ## Test infrastructure modules in Docker services
+	@echo "🔧 Testing infrastructure modules in Docker services..."
+	@echo "Testing system metrics infrastructure..."
+	@docker run --rm test-system-metrics python -c "from alphaloop_logging import AlphaLoopLogger, LoggingConfig; from alphaloop_storage import create_database_manager; from alphaloop_cache import create_cache_manager; from alphaloop_heartbeat import HeartbeatGenerator; print('✅ System metrics infrastructure modules work')"
+	@echo "Testing market data infrastructure..."
+	@docker run --rm test-market-data python -c "from alphaloop_logging import AlphaLoopLogger, LoggingConfig; from alphaloop_storage import create_database_manager; from alphaloop_cache import create_cache_manager; from alphaloop_heartbeat import HeartbeatGenerator; print('✅ Market data infrastructure modules work')"
+	@echo "✅ Infrastructure tests completed!"
+
+services-test-all-docker: ## Run all Docker service tests
+	@echo "🚀 Running all Docker service tests..."
+	@$(MAKE) services-build-test-images
+	@$(MAKE) services-test-system-metrics-docker
+	@$(MAKE) services-test-market-data-docker
+	@$(MAKE) services-test-infrastructure
+	@$(MAKE) services-test-docker-e2e
+	@echo "✅ All Docker service tests completed!"
+
+schema-setup: ## Setup database with YAML-driven schema (on-the-fly generation)
+	@echo "🗄️ Setting up database with YAML-driven schema..."
+	@$(MAKE) services-build-test-images
+	@./scripts/setup-database-and-test.sh
+	@echo "✅ Database setup completed!"
+
+database-setup: ## Setup database schemas only (no testing)
+	@echo "🗄️ Setting up database schemas using alphaloop-storage..."
+	@PYTHONPATH="${PYTHONPATH}:$(pwd)/src" python -m infrastructure.alphaloop_storage setup
+	@echo "✅ Database schemas setup completed!"
+
+database-test: ## Test database connectivity and service data storage
+	@echo "🧪 Testing database connectivity and service data storage..."
+	@$(MAKE) services-build-test-images
+	@./scripts/test-database-and-services.sh
+	@echo "✅ Database and service tests completed!"
+
+services-setup-database: ## Setup database schemas and test real data storage
+	@echo "🗄️ Setting up database and testing real data storage..."
+	@./scripts/setup-database-and-test.sh
+
+services-test-with-database: ## Build images and test with real database storage
+	@echo "🚀 Building images and testing with real database storage..."
+	@$(MAKE) services-build-test-images
+	@$(MAKE) services-setup-database
+	@echo "✅ Database storage testing completed!"
+
 services-test-database: ## Test database service connectivity and functionality
 	@echo "🗄️ Testing database service..."
 	@cd services && docker-compose exec -T alphaloop-database psql -U postgres -d alphaloop_market -c "SELECT version();" || echo "❌ Database test failed"
