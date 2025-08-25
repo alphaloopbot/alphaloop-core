@@ -22,9 +22,9 @@ import os
 from pathlib import Path
 from typing import Any
 
-from ..config.settings import HeartbeatSettings
-from ..utils.file_utils import get_heartbeat_file_path
-from ..utils.time_utils import get_current_timestamp
+from infrastructure.alphaloop_heartbeat.config.settings import HeartbeatSettings
+from infrastructure.alphaloop_heartbeat.utils.file_utils import get_heartbeat_file_path
+from infrastructure.alphaloop_heartbeat.utils.time_utils import get_current_timestamp
 
 logger = logging.getLogger(__name__)
 

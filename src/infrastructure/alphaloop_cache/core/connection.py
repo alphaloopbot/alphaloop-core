@@ -23,9 +23,8 @@ from dataclasses import dataclass
 from typing import Any
 
 import redis.asyncio as redis
+from infrastructure.alphaloop_cache.exceptions import CacheConnectionError, CacheOperationError
 from redis.asyncio import Redis
-
-from ..exceptions import CacheConnectionError, CacheOperationError
 
 
 @dataclass

@@ -3,9 +3,10 @@
 from datetime import datetime, timedelta
 from typing import Any
 
-from ..exceptions import CacheError
-from ..models.cache_entry import CacheEntry
-from ..utils.key_builder import KeyBuilder
+from infrastructure.alphaloop_cache.exceptions import CacheError
+from infrastructure.alphaloop_cache.models.cache_entry import CacheEntry
+from infrastructure.alphaloop_cache.utils.key_builder import KeyBuilder
+
 from .connection import CacheManager
 
 

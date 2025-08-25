@@ -2,9 +2,8 @@
 
 from typing import Any
 
+from infrastructure.alphaloop_storage.exceptions import SchemaError
 from pydantic import BaseModel
-
-from ..exceptions import SchemaError
 
 
 class ColumnDefinition(BaseModel):

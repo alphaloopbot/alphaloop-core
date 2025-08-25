@@ -24,11 +24,11 @@ import inspect
 from datetime import datetime
 from typing import Any
 
-from ..config.settings import LoggingConfig, LogLevel
-from ..handlers.base import BaseHandler
-from ..handlers.console_handler import ConsoleHandler
-from ..handlers.file_handler import FileHandler
-from ..handlers.telegram_handler import TelegramHandler
+from infrastructure.alphaloop_logging.config.settings import LoggingConfig, LogLevel
+from infrastructure.alphaloop_logging.handlers.base import BaseHandler
+from infrastructure.alphaloop_logging.handlers.console_handler import ConsoleHandler
+from infrastructure.alphaloop_logging.handlers.file_handler import FileHandler
+from infrastructure.alphaloop_logging.handlers.telegram_handler import TelegramHandler
 
 
 class AlphaLoopLogger:

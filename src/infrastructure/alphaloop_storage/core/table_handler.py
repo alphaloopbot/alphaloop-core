@@ -5,6 +5,7 @@ from typing import Any
 import pandas as pd
 import polars as pl
 import sqlalchemy
+from infrastructure.alphaloop_storage.exceptions import TableError
 from sqlalchemy import (
     Column,
     DateTime,
@@ -17,7 +18,6 @@ from sqlalchemy import (
 )
 from sqlalchemy.exc import NoSuchTableError
 
-from ..exceptions import TableError
 from .connection import DatabaseManager
 from .schema_generator import SchemaGenerator
 

@@ -3,8 +3,9 @@
 import sys
 from typing import Any
 
-from ..config.settings import ConsoleConfig
-from ..formatters.console_formatter import ConsoleFormatter
+from infrastructure.alphaloop_logging.config.settings import ConsoleConfig
+from infrastructure.alphaloop_logging.formatters.console_formatter import ConsoleFormatter
+
 from .base import BaseHandler
 
 

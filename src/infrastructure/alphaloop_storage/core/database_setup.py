@@ -10,9 +10,9 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+from infrastructure.alphaloop_storage.exceptions import StorageError
 from sqlalchemy import text
 
-from ..exceptions import StorageError
 from .connection import DatabaseConfig, DatabaseManager
 from .table_handler import TableHandler
 

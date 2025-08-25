@@ -5,9 +5,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, TextIO
 
-from ..config.settings import FileConfig
-from ..exceptions import HandlerError
-from ..formatters.file_formatter import FileFormatter
+from infrastructure.alphaloop_logging.config.settings import FileConfig
+from infrastructure.alphaloop_logging.exceptions import HandlerError
+from infrastructure.alphaloop_logging.formatters.file_formatter import FileFormatter
+
 from .base import BaseHandler
 
 
