@@ -7,7 +7,11 @@ import asyncio
 import tempfile
 from pathlib import Path
 
-from alphaloop_heartbeat import HeartbeatChecker, HeartbeatGenerator, HeartbeatSettings
+from infrastructure.alphaloop_heartbeat import (
+    HeartbeatChecker,
+    HeartbeatGenerator,
+    HeartbeatSettings,
+)
 
 
 async def test_heartbeat_generation():

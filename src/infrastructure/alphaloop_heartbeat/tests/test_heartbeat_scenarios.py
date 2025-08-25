@@ -10,7 +10,11 @@ import time
 from pathlib import Path
 
 import pytest
-from alphaloop_heartbeat import HeartbeatChecker, HeartbeatGenerator, HeartbeatSettings
+from infrastructure.alphaloop_heartbeat import (
+    HeartbeatChecker,
+    HeartbeatGenerator,
+    HeartbeatSettings,
+)
 
 
 class TestHeartbeatScenarios:
