@@ -1,5 +1,18 @@
 # AlphaLoop Core
 
+[![Python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Docker](https://img.shields.io/badge/docker-available-blue.svg)](https://www.docker.com/)
+[![Poetry](https://img.shields.io/badge/poetry-managed-orange.svg)](https://python-poetry.org/)
+[![Tests](https://img.shields.io/badge/tests-available-green.svg)](https://github.com/didac-crst/alphaloop-core)
+[![Status](https://img.shields.io/badge/status-active-success.svg)](https://github.com/didac-crst/alphaloop-core)
+[![Code Quality](https://img.shields.io/badge/code%20quality-maintained-blue.svg)](https://github.com/didac-crst/alphaloop-core)
+[![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-red.svg)](https://github.com/astral-sh/ruff)
+[![Type checking: mypy](https://img.shields.io/badge/type%20checking-mypy-blue.svg)](https://mypy-lang.org/)
+[![Architecture: Clean](https://img.shields.io/badge/architecture-clean%20architecture-green.svg)](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+[![Database: PostgreSQL](https://img.shields.io/badge/database-postgresql-blue.svg)](https://www.postgresql.org/)
+[![Cache: Redis](https://img.shields.io/badge/cache-redis-red.svg)](https://redis.io/)
+
 A comprehensive trading system built with Clean Architecture principles and modern Python development practices.
 
 ## 🚀 Features
