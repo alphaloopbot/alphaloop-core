@@ -1,0 +1,30 @@
+services:
+  alphaloop-database:
+    env_file:
+      - ../.env
+    volumes:
+      - ${ALPHALOOP_HOME}/postgres_db/:/var/lib/postgresql/data/
+      - ./init-database.sh:/docker-entrypoint-initdb.d/init-database.sh
+    image: postgres:16.4
+    container_name: alphaloop-database
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_POSTGRES_NAME: ${DB_POSTGRES_NAME}
+      DB_SYS_USER: ${DB_SYS_USER}
+      DB_SYS_PASSWORD: ${DB_SYS_PASSWORD}
+      DB_MARKET_NAME: ${DB_MARKET_NAME}
+      DB_SYS_NAME: ${DB_SYS_NAME}
+      DB_TEST_USER: ${DB_TEST_USER}
+      DB_TEST_PASSWORD: ${DB_TEST_PASSWORD}
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

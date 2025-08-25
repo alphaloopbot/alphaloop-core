@@ -58,7 +58,7 @@ The system follows Clean Architecture principles with clear separation of concer
 - **Exceptions**: Domain, application, infrastructure exceptions
 - **Types**: Custom types, enums, constants
 
-### Reusable Packages (`packages/`)
+### Infrastructure Packages (`infrastructure/`)
 
 #### alphaloop-heartbeat
 Health monitoring and status checking for distributed systems.
@@ -66,11 +66,7 @@ Health monitoring and status checking for distributed systems.
 #### alphaloop-logging
 Centralized logging with multiple output handlers and formatting.
 
-#### alphaloop-database
-Database abstractions, connection management, and migration tools.
 
-#### alphaloop-data
-Data processing, feature engineering, and statistical analysis utilities.
 
 ## Data Flow
 

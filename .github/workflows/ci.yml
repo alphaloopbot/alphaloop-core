@@ -1,0 +1,27 @@
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  unit:
+    name: unit-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: '1.8.3'
+      - name: Install
+        run: |
+          poetry install --no-interaction --no-root
+      - name: Ruff
+        run: poetry run ruff check .
+      - name: MyPy
+        run: poetry run mypy .
+      - name: Pytest (unit only)
+        run: poetry run pytest tests/unit -q

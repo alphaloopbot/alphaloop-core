@@ -1,7 +1,7 @@
 """Abstract base class for all domain entities."""
 
 from abc import ABC, abstractmethod
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -20,8 +20,8 @@ class Entity(ABC):
     ) -> None:
         """Initialize the entity with common properties."""
         self._id = id or uuid4()
-        self._created_at = created_at or datetime.utcnow()
-        self._updated_at = updated_at or datetime.utcnow()
+        self._created_at = created_at or datetime.now(timezone.utc)
+        self._updated_at = updated_at or datetime.now(timezone.utc)
         self._status = status
 
     @property
@@ -46,7 +46,7 @@ class Entity(ABC):
 
     def update_timestamp(self) -> None:
         """Update the last modified timestamp."""
-        self._updated_at = datetime.utcnow()
+        self._updated_at = datetime.now(timezone.utc)
 
     def activate(self) -> None:
         """Activate the entity."""
@@ -76,10 +76,18 @@ class Entity(ABC):
         """Validate the entity state."""
         pass
 
-    @abstractmethod
     def to_dict(self) -> dict[str, Any]:
         """Convert entity to dictionary representation."""
-        pass
+        return {
+            "id": str(self._id),
+            "created_at": self._created_at.replace(tzinfo=timezone.utc)
+            .isoformat()
+            .replace("+00:00", "Z"),
+            "updated_at": self._updated_at.replace(tzinfo=timezone.utc)
+            .isoformat()
+            .replace("+00:00", "Z"),
+            "status": self._status.value,
+        }
 
     def __eq__(self, other: Any) -> bool:
         """Check equality based on ID."""

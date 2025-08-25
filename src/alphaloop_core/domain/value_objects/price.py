@@ -10,7 +10,7 @@ from ...shared.types.enums import Currency
 class Price:
     """Immutable value object representing prices."""
 
-    def __init__(self, value: str | float | Decimal, currency: Currency) -> None:
+    def __init__(self, value: str | float | int | Decimal, currency: Currency) -> None:
         """Initialize Price with value and currency."""
         self._currency = currency
 

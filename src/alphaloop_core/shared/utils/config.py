@@ -1,7 +1,7 @@
 """Configuration utilities for shared utils."""
 
-import os
 from functools import lru_cache
+import os
 from typing import Any
 
 from dotenv import load_dotenv
@@ -28,42 +28,36 @@ def load_environment() -> None:
 
 @lru_cache
 def get_database_url() -> str:
-    """Get the database URL from environment variables."""
-    load_environment()
+    """Get the database URL from environment variables (DEPRECATED)."""
+    import warnings
 
-    # Try to get from DATABASE_URL first
-    database_url = os.getenv("DATABASE_URL")
-    if database_url:
-        return database_url
+    warnings.warn(
+        "get_database_url() is deprecated. Use alphaloop_core.get_storage_config() instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
-    # Construct from individual components
-    host = os.getenv("DB_HOST", "localhost")
-    port = os.getenv("DB_PORT", "5432")
-    name = os.getenv("DB_NAME", "alphaloop")
-    user = os.getenv("DB_USER", "postgres")
-    password = os.getenv("DB_PASSWORD", "password")
+    from alphaloop_core import get_storage_config
 
-    return f"postgresql+asyncpg://{user}:{password}@{host}:{port}/{name}"
+    config = get_storage_config()
+    return config.async_url
 
 
 @lru_cache
 def get_redis_url() -> str:
-    """Get the Redis URL from environment variables."""
-    load_environment()
+    """Get the Redis URL from environment variables (DEPRECATED: Use alphaloop-cache package)."""
+    import warnings
 
-    redis_url = os.getenv("REDIS_URL")
-    if redis_url:
-        return redis_url
+    warnings.warn(
+        "get_redis_url() is deprecated. Use alphaloop_core.get_cache_config() instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
-    host = os.getenv("REDIS_HOST", "localhost")
-    port = os.getenv("REDIS_PORT", "6379")
-    password = os.getenv("REDIS_PASSWORD")
-    db = os.getenv("REDIS_DB", "0")
+    from alphaloop_core import get_cache_config
 
-    if password:
-        return f"redis://:{password}@{host}:{port}/{db}"
-    else:
-        return f"redis://{host}:{port}/{db}"
+    config = get_cache_config()
+    return config.connection_url
 
 
 @lru_cache

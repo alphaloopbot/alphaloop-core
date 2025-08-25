@@ -6,12 +6,13 @@ This script demonstrates how to use the JSON output from:
     make export-pr-comments PR=123
 
 Usage:
-    python scripts/github-pr-tools/analyze_pr_comments.py scripts/github-pr-tools/output/pr_123_comments.json
+    python scripts/github-pr-tools/analyze_pr_comments.py \
+        scripts/github-pr-tools/output/pr_123_comments.json
 """
 
 import json
-import sys
 from pathlib import Path
+import sys
 from typing import Any
 
 
@@ -113,22 +114,22 @@ def generate_llm_prompt(comments: list[dict[str, Any]], analysis: dict[str, Any]
     prompt = f"""# PR Code Review Analysis
 
 ## Summary
-- **Total Comments**: {analysis['total_comments']}
-- **Commenters**: {', '.join(analysis['commenters'])}
-- **Files Affected**: {len(analysis['files_affected'])} files
+- **Total Comments**: {analysis["total_comments"]}
+- **Commenters**: {", ".join(analysis["commenters"])}
+- **Files Affected**: {len(analysis["files_affected"])} files
 
 ## Comment Types
-- Refactor Suggestions: {analysis['suggestion_types']['refactor']}
-- Bug Fixes: {analysis['suggestion_types']['bug']}
-- Security Issues: {analysis['suggestion_types']['security']}
-- Performance: {analysis['suggestion_types']['performance']}
-- Documentation: {analysis['suggestion_types']['documentation']}
-- Other: {analysis['suggestion_types']['other']}
+- Refactor Suggestions: {analysis["suggestion_types"]["refactor"]}
+- Bug Fixes: {analysis["suggestion_types"]["bug"]}
+- Security Issues: {analysis["suggestion_types"]["security"]}
+- Performance: {analysis["suggestion_types"]["performance"]}
+- Documentation: {analysis["suggestion_types"]["documentation"]}
+- Other: {analysis["suggestion_types"]["other"]}
 
 ## Severity Distribution
-- High Priority: {analysis['severity_levels']['high']}
-- Medium Priority: {analysis['severity_levels']['medium']}
-- Low Priority: {analysis['severity_levels']['low']}
+- High Priority: {analysis["severity_levels"]["high"]}
+- Medium Priority: {analysis["severity_levels"]["medium"]}
+- Low Priority: {analysis["severity_levels"]["low"]}
 
 ## Detailed Comments
 
@@ -136,12 +137,12 @@ def generate_llm_prompt(comments: list[dict[str, Any]], analysis: dict[str, Any]
 
     for i, comment in enumerate(comments, 1):
         prompt += f"""### Comment {i}
-**File**: {comment.get('path', 'Unknown')}
-**Line**: {comment.get('line', 'Unknown')}
-**Author**: {comment.get('user', {}).get('login', 'Unknown')}
-**Type**: {comment.get('subject_type', 'Unknown')}
+**File**: {comment.get("path", "Unknown")}
+**Line**: {comment.get("line", "Unknown")}
+**Author**: {comment.get("user", {}).get("login", "Unknown")}
+**Type**: {comment.get("subject_type", "Unknown")}
 
-{comment.get('body', 'No body')}
+{comment.get("body", "No body")}
 
 ---
 """
@@ -166,10 +167,12 @@ def main() -> None:
     if len(sys.argv) < 2:
         print("Usage: python scripts/analyze_pr_comments.py <comments_json_file> [--latest-only]")
         print(
-            "Example: python scripts/github-pr-tools/analyze_pr_comments.py scripts/github-pr-tools/output/pr_123_comments.json"
+            "Example: python scripts/github-pr-tools/analyze_pr_comments.py "
+            "scripts/github-pr-tools/output/pr_123_comments.json"
         )
         print(
-            "Example: python scripts/github-pr-tools/analyze_pr_comments.py scripts/github-pr-tools/output/pr_123_comments.json --latest-only"
+            "Example: python scripts/github-pr-tools/analyze_pr_comments.py "
+            "scripts/github-pr-tools/output/pr_123_comments.json --latest-only"
         )
         sys.exit(1)
 
@@ -206,11 +209,13 @@ def main() -> None:
         print("✅ Analysis complete!")
         print("📊 Summary:")
         print(
-            f"   - {analysis['total_comments']} comments from {len(analysis['commenters'])} reviewers"
+            f"   - {analysis['total_comments']} comments from "
+            f"{len(analysis['commenters'])} reviewers"
         )
         print(f"   - {len(analysis['files_affected'])} files affected")
         print(
-            f"   - {analysis['suggestion_types']['bug']} bug fixes, {analysis['suggestion_types']['refactor']} refactor suggestions"
+            f"   - {analysis['suggestion_types']['bug']} bug fixes, "
+            f"{analysis['suggestion_types']['refactor']} refactor suggestions"
         )
         print(f"   - {analysis['severity_levels']['high']} high priority items")
         print("")

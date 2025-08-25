@@ -1,0 +1,37 @@
+name: alphaloop-core
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - pip
+  - poetry
+  # Core dependencies
+  - numpy=1.26.4
+  - fastapi
+  - uvicorn
+  - pydantic
+  - python-dotenv
+  - sqlalchemy
+  - asyncpg
+  - redis-py
+  - aio-pika
+  - psutil
+  - aiofiles
+  - pyyaml
+  # Development dependencies
+  - pytest
+  - pytest-asyncio
+  - pytest-cov
+  - ruff
+  - mypy
+  - pytest-dotenv
+  - hypothesis
+  - httpx
+  - pre-commit
+  # Additional pip packages (if not available in conda)
+  - pip:
+    - types-redis
+    - types-requests
+    - pandas-stubs
+    - types-PyYAML

@@ -1,0 +1,365 @@
+# Database Schema Configuration for AlphaLoop Core
+# Based on legacy cryptobot_core/dbTables.py structure
+
+# Time constants (in seconds)
+time_constants:
+  minute: 60
+  hour: 3600
+  day: 86400
+  week: 604800
+  month: 2678400  # 31 days
+  year: 31622400  # 366 days
+
+# Database definitions
+databases:
+  alphaloop_sys:
+    domain: system
+    description: "System monitoring and metrics database"
+    tables:
+      system_attributes:
+        type: metadata
+        description: "System hardware and configuration information"
+        columns:
+          - name: "id"
+            type: "Integer"
+            primary_key: true
+          - name: "kernel_version"
+            type: "String"
+          - name: "system_name"
+            type: "String"
+          - name: "node_name"
+            type: "String"
+          - name: "host_name"
+            type: "String"
+          - name: "machine"
+            type: "String"
+          - name: "boot_time"
+            type: "TIMESTAMP"
+          - name: "app_start_time"
+            type: "TIMESTAMP"
+          - name: "cpu_cores"
+            type: "Integer"
+          - name: "cpu_cores_logical"
+            type: "Integer"
+          - name: "ram_total"
+            type: "Float"
+          - name: "swap_total"
+            type: "Float"
+            nullable: true
+          - name: "ssd_total"
+            type: "Float"
+        policies:
+          oncloud: {}
+          local:
+            tasks: ["BACKUP"]
+            update_frequency: 7200  # 2 hours
+            waiting_extra_backup_time: 0
+
+      system_metrics:
+        type: data
+        description: "Real-time system metrics (30-second granularity)"
+        metadata_table: "system_attributes"
+        columns:
+          - name: "id"
+            type: "Integer"
+            primary_key: true
+          - name: "metadata_id"
+            type: "Integer"
+            foreign_key: "system_attributes.id"
+          - name: "timestamp_id"
+            type: "Integer"
+          - name: "cpu_temperature"
+            type: "Float"
+            nullable: true
+          - name: "cpu_speed"
+            type: "Integer"
+            nullable: true
+          - name: "cpu_usage"
+            type: "Float"
+          - name: "cores_usage"
+            type: "JSON"
+            nullable: true
+          - name: "core_usage_max"
+            type: "Float"
+            nullable: true
+          - name: "core_usage_min"
+            type: "Float"
+            nullable: true
+          - name: "ram_usage"
+            type: "Float"
+          - name: "swap_usage"
+            type: "Float"
+            nullable: true
+          - name: "ssd_usage"
+            type: "Float"
+          - name: "ip_address"
+            type: "String"
+            nullable: true
+          - name: "ip_renewed"
+            type: "Boolean"
+            nullable: true
+        policies:
+          local:
+            tasks: ["DELETION", "BACKUP"]
+            deletion_horizon: 777600  # 9 days
+            time_granularity: 30  # 30 seconds
+            update_frequency: 1800  # 30 minutes
+            waiting_extra_backup_time: 60  # 1 minute
+
+      system_metrics_summary:
+        type: aggregated
+        description: "Aggregated system metrics at multiple timeframes"
+        metadata_table: "system_attributes"
+        parent_table: "system_metrics"
+        reporting: true
+        aggregation:
+          cpu_temperature:
+            - field: "cpu_temperature"
+              operation: "mean"
+          cpu_speed:
+            - field: "cpu_speed"
+              operation: "mean"
+          cpu_usage:
+            - field: "cpu_usage"
+              operation: "mean"
+          core_usage_max:
+            - field: "core_usage_max"
+              operation: "mean"
+          core_usage_min:
+            - field: "core_usage_min"
+              operation: "mean"
+          ram_usage:
+            - field: "ram_usage"
+              operation: "mean"
+          swap_usage:
+            - field: "swap_usage"
+              operation: "mean"
+          ssd_usage:
+            - field: "ssd_usage"
+              operation: "mean"
+          ip_address:
+            - field: "ip_address"
+              operation: "last"
+        columns:
+          - name: "id"
+            type: "Integer"
+            primary_key: true
+          - name: "metadata_id"
+            type: "Integer"
+            foreign_key: "system_attributes.id"
+          - name: "timestamp_id"
+            type: "Integer"
+          - name: "cpu_temperature"
+            type: "Float"
+          - name: "cpu_speed"
+            type: "Float"
+          - name: "cpu_usage"
+            type: "Float"
+          - name: "core_usage_max"
+            type: "Float"
+          - name: "core_usage_min"
+            type: "Float"
+          - name: "ram_usage"
+            type: "Float"
+          - name: "swap_usage"
+            type: "Float"
+          - name: "ssd_usage"
+            type: "Float"
+          - name: "ip_address"
+            type: "String"
+        policies:
+          local:
+            tasks: ["DELETION", "UPDATING", "BACKUP"]
+            suffix_name: "1m"
+            deletion_horizon: 777600  # 9 days
+            time_granularity: 60  # 1 minute
+            update_frequency: 1800  # 30 minutes
+            waiting_extra_backup_time: 120  # 2 minutes
+          local_10m:
+            tasks: ["DELETION", "UPDATING", "BACKUP"]
+            suffix_name: "10m"
+            deletion_horizon: 7776000  # 3 months
+            time_granularity: 600  # 10 minutes
+            update_frequency: 7200  # 2 hours
+            waiting_extra_backup_time: 180  # 3 minutes
+          local_2h:
+            tasks: ["DELETION", "UPDATING", "BACKUP"]
+            suffix_name: "2h"
+            deletion_horizon: 94608000  # 3 years
+            time_granularity: 7200  # 2 hours
+            update_frequency: 21600  # 6 hours
+            waiting_extra_backup_time: 240  # 4 minutes
+          local_1d:
+            tasks: ["UPDATING", "BACKUP"]
+            suffix_name: "1d"
+            time_granularity: 86400  # 1 day
+            update_frequency: 86400  # 1 day
+            waiting_extra_backup_time: 300  # 5 minutes
+
+  alphaloop_market:
+    domain: tickers
+    description: "Market data and ticker information database"
+    tables:
+      tickers_metadata:
+        type: metadata
+        description: "Ticker definitions and exchange information"
+        columns:
+          - name: "id"
+            type: "Integer"
+            primary_key: true
+          - name: "ticker"
+            type: "String"
+          - name: "base"
+            type: "String"
+          - name: "quote"
+            type: "String"
+          - name: "exchange"
+            type: "String"
+          - name: "active"
+            type: "Boolean"
+        indexes:
+          - name: "uq_tickers_exchange"
+            unique: true
+            columns: ["ticker", "exchange"]
+          - name: "idx_tickers_metadata_id"
+            columns: ["metadata_id"]
+        policies:
+          oncloud: {}
+          local:
+            tasks: ["BACKUP"]
+            update_frequency: 7200  # 2 hours
+            waiting_extra_backup_time: 0
+
+      tickers_prices:
+        type: data
+        description: "Real-time price data (10-second granularity)"
+        metadata_table: "tickers_metadata"
+        fetching_info:
+          price: "last"
+          quote_volume24h: "quoteVolume"
+        columns:
+          - name: "id"
+            type: "Integer"
+            primary_key: true
+          - name: "metadata_id"
+            type: "Integer"
+            foreign_key: "tickers_metadata.id"
+          - name: "timestamp_id"
+            type: "Integer"
+          - name: "price"
+            type: "Float"
+          - name: "quote_volume24h"
+            type: "Float"
+        policies:
+          oncloud:
+            tasks: ["DELETION"]
+            deletion_horizon: 270000  # 75 hours
+            time_granularity: 10  # 10 seconds
+          local:
+            tasks: ["DELETION", "ARCHIVING", "BACKUP"]
+            deletion_horizon: 270000  # 75 hours
+            time_granularity: 10  # 10 seconds
+            update_frequency: 1800  # 30 minutes
+            archiving_timespan: 100000  # 100,000 seconds
+            waiting_extra_backup_time: 60  # 1 minute
+
+      tickers_prices_ohlca:
+        type: aggregated
+        description: "OHLC aggregated price data at multiple timeframes"
+        metadata_table: "tickers_metadata"
+        parent_table: "tickers_prices"
+        reporting: true
+        aggregation:
+          price:
+            - field: "open"
+              operation: "first"
+            - field: "high"
+              operation: "max"
+            - field: "low"
+              operation: "min"
+            - field: "close"
+              operation: "last"
+            - field: "average"
+              operation: "mean"
+          quote_volume24h:
+            - field: "quote_volume24h"
+              operation: "last"
+        columns:
+          - name: "id"
+            type: "Integer"
+            primary_key: true
+          - name: "metadata_id"
+            type: "Integer"
+            foreign_key: "tickers_metadata.id"
+          - name: "timestamp_id"
+            type: "Integer"
+          - name: "open"
+            type: "Float"
+          - name: "high"
+            type: "Float"
+          - name: "low"
+            type: "Float"
+          - name: "close"
+            type: "Float"
+          - name: "average"
+            type: "Float"
+          - name: "quote_volume24h"
+            type: "Float"
+        policies:
+          local_1m:
+            tasks: ["DELETION", "UPDATING", "BACKUP"]
+            suffix_name: "1m"
+            deletion_horizon: 777600  # 9 days
+            time_granularity: 60  # 1 minute
+            update_frequency: 1800  # 30 minutes
+            waiting_extra_backup_time: 120  # 2 minutes
+          local_10m:
+            tasks: ["DELETION", "UPDATING", "BACKUP"]
+            suffix_name: "10m"
+            deletion_horizon: 7776000  # 3 months
+            time_granularity: 600  # 10 minutes
+            update_frequency: 7200  # 2 hours
+            waiting_extra_backup_time: 180  # 3 minutes
+          local_2h:
+            tasks: ["DELETION", "UPDATING", "BACKUP"]
+            suffix_name: "2h"
+            deletion_horizon: 94608000  # 3 years
+            time_granularity: 7200  # 2 hours
+            update_frequency: 21600  # 6 hours
+            waiting_extra_backup_time: 240  # 4 minutes
+          local_1d:
+            tasks: ["UPDATING", "BACKUP"]
+            suffix_name: "1d"
+            time_granularity: 86400  # 1 day
+            update_frequency: 86400  # 1 day
+            waiting_extra_backup_time: 300  # 5 minutes
+
+# System configuration
+systems:
+  oncloud:
+    description: "Cloud server with fixed IP"
+    role: "central_hub"
+    databases: ["alphaloop_market"]
+
+  local:
+    description: "Local Raspberry Pi nodes"
+    role: "distributed_node"
+    databases: ["alphaloop_sys", "alphaloop_market"]
+
+# Task definitions
+tasks:
+  ARCHIVING:
+    description: "Move old data to archive storage"
+    applicable_to: ["data", "aggregated"]
+
+  DELETION:
+    description: "Remove data after retention period"
+    applicable_to: ["data", "aggregated"]
+
+  UPDATING:
+    description: "Aggregate data at different timeframes"
+    applicable_to: ["aggregated"]
+
+  BACKUP:
+    description: "Create data backups"
+    applicable_to: ["metadata", "data", "aggregated"]

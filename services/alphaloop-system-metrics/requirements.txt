@@ -1,0 +1,2 @@
+# Install alphaloop-core which includes all infrastructure packages
+alphaloop-core

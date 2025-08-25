@@ -1,11 +1,13 @@
 """Centralized configuration management for AlphaLoop Core."""
 
-import os
 from functools import lru_cache
+import os
 from pathlib import Path
 from types import MappingProxyType
 
 from dotenv import load_dotenv
+
+from alphaloop_core.shared.types.enums import Currency
 
 # Try to load .env from multiple possible locations
 env_paths = [
@@ -49,8 +51,25 @@ def settings() -> MappingProxyType[str, str]:
         # DATABASE_URL fallback composed from individual DB_* vars to prevent drift
         "DATABASE_URL": os.getenv(
             "DATABASE_URL",
-            f"postgresql://{os.getenv('DB_USER','postgres')}:{os.getenv('DB_PASSWORD','password')}"
-            f"@{os.getenv('DB_HOST','localhost')}:{os.getenv('DB_PORT','5432')}/{os.getenv('DB_NAME','alphaloop')}",
+            f"postgresql://{os.getenv('DB_USER', 'postgres')}:"
+            f"{os.getenv('DB_PASSWORD', 'password')}"
+            f"@{os.getenv('DB_HOST', 'localhost')}:"
+            f"{os.getenv('DB_PORT', '5432')}/{os.getenv('DB_NAME', 'alphaloop')}",
         ),
+        # Default currency for market data and trading operations
+        "DEFAULT_CURRENCY": os.getenv("DEFAULT_CURRENCY", "USDT").strip().upper(),
     }
     return MappingProxyType(cfg)
+
+
+def get_default_currency() -> Currency:
+    """Get the default currency from configuration."""
+    currency_str = settings()["DEFAULT_CURRENCY"].strip().upper()
+    try:
+        return Currency(currency_str)
+    except ValueError:
+        # Fallback to USDT if invalid currency is configured
+        import logging
+
+        logging.warning(f"Invalid currency code '{currency_str}', falling back to USDT")
+        return Currency.USDT
