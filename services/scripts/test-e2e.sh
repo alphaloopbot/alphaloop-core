@@ -27,7 +27,12 @@ run_test() {
     echo -e "\n${BLUE}🔍 Testing: ${test_name}${NC}"
     TOTAL_TESTS=$((TOTAL_TESTS + 1))
 
-    if eval "$test_command"; then
+    if declare -F -- "$test_command" >/dev/null 2>&1; then
+        "$test_command"
+    else
+        bash -c "$test_command"
+    fi
+    if [ $? -eq 0 ]; then
         echo -e "${GREEN}✅ PASS: ${test_name}${NC}"
         PASSED_TESTS=$((PASSED_TESTS + 1))
     else
@@ -149,9 +154,9 @@ test_data_flow() {
         cd services
 
         # Check if system metrics are being written to database
-        docker-compose exec -T alphaloop-database psql -U postgres -d alphaloop_sys -c "
-SELECT COUNT(*) FROM system_metrics WHERE created_at > NOW() - INTERVAL '5 minutes';
-" | grep -v "count" | grep -v "---" | grep -v "rows" | grep -q "[0-9]"
+        docker-compose exec -T alphaloop-database \
+          psql -U postgres -d alphaloop_sys -t -A -c "SELECT COUNT(*) FROM system_metrics WHERE created_at > NOW() - INTERVAL '5 minutes';" \
+          | awk '($1+0)>0 {exit 0} END{exit 1}'
     )
 }
 
