@@ -76,7 +76,7 @@ class TableHandler:
 
             # Find the table definition in the schema
             table_spec = None
-            for db_name, db_spec in schema["databases"].items():
+            for _db_name, db_spec in schema["databases"].items():
                 if self.table_name in db_spec["tables"]:
                     table_spec = db_spec["tables"][self.table_name]
                     break
@@ -88,7 +88,7 @@ class TableHandler:
             self._create_table_from_spec(table_spec)
 
         except Exception as e:
-            raise TableError(f"Failed to create table '{self.table_name}' from schema: {e}")
+            raise TableError(f"Failed to create table '{self.table_name}' from schema: {e}") from e
 
     def _create_table_from_spec(self, table_spec: dict[str, Any]) -> None:
         """Create table from table specification."""
@@ -124,7 +124,7 @@ class TableHandler:
             else:
                 # Handle foreign key
                 if "foreign_key" in col_spec:
-                    fk_ref = col_spec["foreign_key"]
+                    # TODO: Implement foreign key handling
                     columns.append(Column(col_name, sqlalchemy_type, nullable=False))
                 else:
                     # Handle nullable
@@ -206,7 +206,7 @@ class TableHandler:
                 else:
                     raise ValueError(f"Data must be dict or list[dict], got {type(data)}")
         except Exception as e:
-            raise TableError(f"Failed to insert data into {self.table_name}: {e}")
+            raise TableError(f"Failed to insert data into {self.table_name}: {e}") from e
 
     async def query_data(
         self,
@@ -240,7 +240,7 @@ class TableHandler:
 
                 return [dict(row._mapping) for row in rows]
         except Exception as e:
-            raise TableError(f"Failed to query data from {self.table_name}: {e}")
+            raise TableError(f"Failed to query data from {self.table_name}: {e}") from e
 
     async def update_data(self, filters: dict[str, Any], updates: dict[str, Any]) -> int:
         """Update data in table."""
@@ -261,7 +261,7 @@ class TableHandler:
 
                 return result.rowcount
         except Exception as e:
-            raise TableError(f"Failed to update data in {self.table_name}: {e}")
+            raise TableError(f"Failed to update data in {self.table_name}: {e}") from e
 
     async def delete_data(self, filters: dict[str, Any]) -> int:
         """Delete data from table."""
@@ -282,18 +282,18 @@ class TableHandler:
 
                 return result.rowcount
         except Exception as e:
-            raise TableError(f"Failed to delete data from {self.table_name}: {e}")
+            raise TableError(f"Failed to delete data from {self.table_name}: {e}") from e
 
     def to_pandas(self, query: str) -> pd.DataFrame:
         """Execute query and return results as pandas DataFrame."""
         try:
             return pd.read_sql(query, self.database_manager.sync_engine)
         except Exception as e:
-            raise TableError(f"Failed to execute query on {self.table_name}: {e}")
+            raise TableError(f"Failed to execute query on {self.table_name}: {e}") from e
 
     def to_polars(self, query: str) -> pl.DataFrame:
         """Execute query and return results as polars DataFrame."""
         try:
             return pl.read_database(query, self.database_manager.sync_engine)
         except Exception as e:
-            raise TableError(f"Failed to execute query on {self.table_name}: {e}")
+            raise TableError(f"Failed to execute query on {self.table_name}: {e}") from e

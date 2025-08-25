@@ -216,7 +216,7 @@ class PubSubManager:
             keys = await self._get_keys_by_pattern(pattern)
 
             messages = []
-            for key in keys[:limit]:
+            for key in keys:
                 cached_data = await self.cache_manager.get_key(key)
                 if cached_data:
                     try:
@@ -227,7 +227,7 @@ class PubSubManager:
 
             # Sort by timestamp (newest first)
             messages.sort(key=lambda x: x.timestamp, reverse=True)
-            return messages
+            return messages[:limit]
         except Exception as e:
             raise PubSubError(f"Failed to get messages from {channel}: {e}") from e
 

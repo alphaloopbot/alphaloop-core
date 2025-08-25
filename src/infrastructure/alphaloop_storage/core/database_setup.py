@@ -44,9 +44,9 @@ class DatabaseSetup:
             with open(self.config_path) as f:
                 return yaml.safe_load(f)
         except FileNotFoundError:
-            raise StorageError(f"Schema file not found: {self.config_path}")
+            raise StorageError(f"Schema file not found: {self.config_path}") from None
         except yaml.YAMLError as e:
-            raise StorageError(f"Invalid YAML in schema file: {e}")
+            raise StorageError(f"Invalid YAML in schema file: {e}") from e
 
     async def setup_databases(self, db_manager: DatabaseManager) -> None:
         """Set up all databases and tables from YAML schema."""
@@ -60,7 +60,7 @@ class DatabaseSetup:
                 await self._create_tables_for_database(db_manager, db_name, db_spec)
 
         except Exception as e:
-            raise StorageError(f"Failed to set up databases: {e}")
+            raise StorageError(f"Failed to set up databases: {e}") from e
 
     async def _create_database(self, db_manager: DatabaseManager, db_name: str) -> None:
         """Create a database if it doesn't exist."""
@@ -87,7 +87,7 @@ class DatabaseSetup:
             print(f"✅ Created database: {db_name}")
 
         except Exception as e:
-            raise StorageError(f"Failed to create database {db_name}: {e}")
+            raise StorageError(f"Failed to create database {db_name}: {e}") from e
 
     async def _create_tables_for_database(
         self, db_manager: DatabaseManager, db_name: str, db_spec: dict[str, Any]
@@ -109,7 +109,7 @@ class DatabaseSetup:
                 await self._create_table(db_manager_specific, table_name, table_spec)
 
         except Exception as e:
-            raise StorageError(f"Failed to create tables for database {db_name}: {e}")
+            raise StorageError(f"Failed to create tables for database {db_name}: {e}") from e
 
     async def _create_table(
         self, db_manager: DatabaseManager, table_name: str, table_spec: dict[str, Any]
