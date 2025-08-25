@@ -125,7 +125,7 @@ heartbeat_generator = await service_factory.get_heartbeat_generator("my-service"
 
 # Use services
 logger.info("Application started")
-cache_manager.set("test", "value")
+cache_manager.set_key("test", "value")
 await heartbeat_generator.generate_heartbeat()
 ```
 

@@ -215,7 +215,7 @@ class CacheManager:
     async def set_key(self, key: str, value: Any, ttl: int | None = None) -> bool:
         """Set key with optional TTL."""
         try:
-            if isinstance(value, dict | list):
+            if isinstance(value, (dict, list)):
                 value = json.dumps(value)
             await self.redis_client.set(key, value, ex=ttl)
             return True

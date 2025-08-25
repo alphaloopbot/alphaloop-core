@@ -178,7 +178,8 @@ class SystemMetricsService:
 
             # Use logger's built-in sync method
             self.logger.info_sync(
-                f"Collected metrics: CPU={cpu_percent}%, Memory={memory_percent}%, Disk={disk_percent}%"
+                f"Collected metrics: CPU={cpu_percent}%, "
+                f"Memory={memory_percent}%, Disk={disk_percent}%"
             )
 
             return metrics
@@ -204,14 +205,14 @@ class SystemMetricsService:
             success = await self.metrics_handler.insert_data(metrics)
 
             if success:
-                await self.logger.info(f"Stored metrics: {len(metrics)} fields")
+                self.logger.info_sync(f"Stored metrics: {len(metrics)} fields")
                 return True
             else:
-                await self.logger.error("Failed to store metrics using infrastructure")
+                self.logger.error_sync("Failed to store metrics using infrastructure")
                 return False
 
         except Exception as e:
-            await self.logger.error(f"Error storing metrics: {e}")
+            self.logger.error_sync(f"Error storing metrics: {e}")
             return False
 
     def store_metrics(self, metrics: dict[str, Any]) -> bool:
