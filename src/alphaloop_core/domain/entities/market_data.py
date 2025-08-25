@@ -16,7 +16,7 @@ class MarketData(Entity):
 
     def __init__(
         self,
-        metadata_id: str,
+        metadata_id: int,
         timestamp_id: int,
         price: float,
         quote_volume24h: float,
@@ -28,13 +28,13 @@ class MarketData(Entity):
         """Initialize the market data entity."""
         super().__init__(entity_id, created_at, updated_at)
 
-        self._metadata_id = metadata_id
+        self._metadata_id = int(metadata_id)
         self._timestamp_id = timestamp_id
         self._price = Price(price, currency or get_default_currency())
         self._quote_volume24h = Quantity(quote_volume24h)
 
     @property
-    def metadata_id(self) -> str:
+    def metadata_id(self) -> int:
         """Get the metadata ID reference."""
         return self._metadata_id
 
@@ -69,8 +69,8 @@ class MarketData(Entity):
             **base_dict,
             "metadata_id": self._metadata_id,
             "timestamp_id": self._timestamp_id,
-            "price": self._price.value,
-            "quote_volume24h": self._quote_volume24h.value,
+            "price": str(self._price.value),
+            "quote_volume24h": str(self._quote_volume24h.value),
             "currency": self._price.currency.value,
         }
 

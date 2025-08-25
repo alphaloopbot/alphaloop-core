@@ -31,6 +31,9 @@ class BaseFormatter(ABC):
         Returns:
             Truncated message if necessary.
         """
+        if max_length <= 0:
+            return ""
         if len(message) <= max_length:
             return message
-        return f"{message[:max_length]}..."
+        # Use a single character ellipsis to stay within max_length
+        return f"{message[:max_length-1]}…"

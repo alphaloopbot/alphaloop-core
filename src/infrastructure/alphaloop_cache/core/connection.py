@@ -237,7 +237,8 @@ class CacheManager:
     async def key_exists(self, key: str) -> bool:
         """Check if key exists."""
         try:
-            return await self.redis_client.exists(key) > 0
+            result = await self.redis_client.exists(key)
+            return result > 0
         except Exception as e:
             raise CacheOperationError(f"Failed to check key existence {key}: {e}") from e
 

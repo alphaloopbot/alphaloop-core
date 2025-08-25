@@ -60,14 +60,10 @@ class SystemMetricsService:
             # For now, we'll create new metadata each time (in production, you'd query existing)
             metadata = {
                 "host_name": hostname,
-                "system_name": (
-                    os.uname().sysname if hasattr(os, "uname") else "Unknown"
-                ),
+                "system_name": (os.uname().sysname if hasattr(os, "uname") else "Unknown"),
                 "node_name": os.uname().nodename if hasattr(os, "uname") else hostname,
                 "machine": os.uname().machine if hasattr(os, "uname") else "Unknown",
-                "kernel_version": (
-                    os.uname().release if hasattr(os, "uname") else "Unknown"
-                ),
+                "kernel_version": (os.uname().release if hasattr(os, "uname") else "Unknown"),
                 "cpu_cores": psutil.cpu_count(logical=False),
                 "cpu_cores_logical": psutil.cpu_count(logical=True),
                 "ram_total": float(psutil.virtual_memory().total),  # Match YAML schema
@@ -82,8 +78,7 @@ class SystemMetricsService:
 
         except Exception as e:
             self.logger.error_sync(f"Error creating metadata: {e}")
-            # Return a default metadata ID (1) for now
-            return 1
+            raise
 
     def collect_metrics(self) -> dict[str, Any] | None:
         """Collect current system metrics."""
@@ -172,13 +167,11 @@ class SystemMetricsService:
                 metrics["cpu_speed"] = int(cpu_speed)
 
             if cpu_freq and cpu_freq.current:
-                metrics["cpu_speed"] = int(cpu_freq.current / 1000)  # Convert to MHz
+                metrics["cpu_speed"] = int(cpu_freq.current)  # Already in MHz
 
             # Add per-core usage if available
             if cpu_per_core:
-                cores_usage = {
-                    f"core_{i}": usage for i, usage in enumerate(cpu_per_core)
-                }
+                cores_usage = {f"core_{i}": usage for i, usage in enumerate(cpu_per_core)}
                 metrics["cores_usage"] = cores_usage
                 metrics["core_usage_max"] = max(cpu_per_core)
                 metrics["core_usage_min"] = min(cpu_per_core)
@@ -243,7 +236,7 @@ class SystemMetricsService:
         """Collect and store metrics in one operation."""
         try:
             # Generate heartbeat
-            self.heartbeat_generator.generate_heartbeat()
+            asyncio.run(self.heartbeat_generator.generate_heartbeat())
 
             # Collect metrics
             metrics = self.collect_metrics()
@@ -257,7 +250,7 @@ class SystemMetricsService:
 
     def run_forever(self) -> None:
         """Main loop to collect and store metrics continuously."""
-        self.logger.info(
+        self.logger.info_sync(
             f"Starting System Metrics Service (interval: {self.metrics_interval}s)"
         )
 
@@ -267,7 +260,7 @@ class SystemMetricsService:
                 time.sleep(self.metrics_interval)
 
             except KeyboardInterrupt:
-                self.logger.info("Shutting down System Metrics Service")
+                self.logger.info_sync("Shutting down System Metrics Service")
                 break
             except Exception as e:
                 self.logger.error_sync(f"Error in main loop: {e}")

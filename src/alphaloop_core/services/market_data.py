@@ -102,7 +102,13 @@ class MarketDataService:
 
                 # Insert metadata and store the ID
                 metadata_id = await self.metadata_handler.insert_data(metadata)
-                metadata_ids[pair["symbol"]] = metadata_id
+                if metadata_id is not None:
+                    if isinstance(metadata_id, list):
+                        metadata_ids[pair["symbol"]] = metadata_id[0] if metadata_id else 1
+                    else:
+                        metadata_ids[pair["symbol"]] = metadata_id
+                else:
+                    metadata_ids[pair["symbol"]] = 1
 
             return metadata_ids
 
@@ -178,9 +184,9 @@ class MarketDataService:
             inserted_ids = await self.data_handler.insert_data(market_data)
 
             if inserted_ids is not None:
-                await self.logger.info(
-                    f"Stored {len(market_data)} market data records using infrastructure"
-                )
+                            self.logger.info_sync(
+                f"Stored {len(market_data)} market data records using infrastructure"
+            )
 
                 # Cache latest prices for quick access
                 for data in market_data:
@@ -193,15 +199,15 @@ class MarketDataService:
                                 break
                     if symbol:
                         cache_key = f"latest_price_{symbol}"
-                        await self.cache_manager.set(cache_key, data, ttl=300)
+                        await self.cache_manager.set_key(cache_key, data, ttl=300)
 
                 return True
             else:
-                await self.logger.error("Failed to store market data using infrastructure")
+                self.logger.error_sync("Failed to store market data using infrastructure")
                 return False
 
         except Exception as e:
-            await self.logger.error(f"Error storing market data: {e}")
+            self.logger.error_sync(f"Error storing market data: {e}")
             return False
 
     def store_market_data(self, market_data: list[dict[str, Any]]) -> bool:
@@ -228,21 +234,21 @@ class MarketDataService:
             return False
 
         try:
-            self.logger.info("Syncing with cloud infrastructure...")
+            self.logger.info_sync("Syncing with cloud infrastructure...")
             # TODO: Implement cloud sync logic
             # - Check for missing data periods
             # - Request missing data from cloud API
             # - Store received data
             return True
         except Exception as e:
-            self.logger.error(f"Error syncing with cloud: {e}")
+            self.logger.error_sync(f"Error syncing with cloud: {e}")
             return False
 
     def collect_and_store_market_data(self) -> bool:
         """Collect and store market data in one operation."""
         try:
             # Generate heartbeat
-            self.heartbeat_generator.generate_heartbeat()
+            asyncio.run(self.heartbeat_generator.generate_heartbeat())
 
             # Collect market data
             market_data = self.collect_from_exchanges()
@@ -256,7 +262,7 @@ class MarketDataService:
 
     def run_forever(self) -> None:
         """Main loop to collect and store market data continuously."""
-        self.logger.info(f"Starting Market Data Service (interval: {self.market_data_interval}s)")
+        self.logger.info_sync(f"Starting Market Data Service (interval: {self.market_data_interval}s)")
 
         last_sync_time = time.time()
 
@@ -277,10 +283,10 @@ class MarketDataService:
                 time.sleep(self.market_data_interval)
 
             except KeyboardInterrupt:
-                self.logger.info("Shutting down Market Data Service")
+                self.logger.info_sync("Shutting down Market Data Service")
                 break
             except Exception as e:
-                self.logger.error(f"Error in main loop: {e}")
+                self.logger.error_sync(f"Error in main loop: {e}")
                 time.sleep(self.market_data_interval)
 
     def run_once(self) -> bool:

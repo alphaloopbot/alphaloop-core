@@ -265,13 +265,19 @@ databases:
         reporting: true
         aggregation:
           price:
-            - ("open", "first")
-            - ("high", "max")
-            - ("low", "min")
-            - ("close", "last")
-            - ("average", "mean")
+            - field: "open"
+              operation: "first"
+            - field: "high"
+              operation: "max"
+            - field: "low"
+              operation: "min"
+            - field: "close"
+              operation: "last"
+            - field: "average"
+              operation: "mean"
           quote_volume24h:
-            - ("quote_volume24h", "last")
+            - field: "quote_volume24h"
+              operation: "last"
         columns:
           - name: "id"
             type: "Integer"

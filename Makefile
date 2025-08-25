@@ -255,7 +255,7 @@ services-test-system-metrics-docker: ## Test system metrics service in Docker
 
 services-test-market-data-docker: ## Test market data service in Docker
 	@echo "📈 Testing market data service in Docker..."
-	@docker run --rm test-market-data python -c "from alphaloop_core.services.market_data import MarketDataService; service = MarketDataService(); data = service.get_mock_market_data(); print(f'✅ Generated {len(data)} market data records') if data else print('❌ Failed to generate market data')"
+	@docker run --rm test-market-data python -c "from alphaloop_core.services.market_data import MarketDataService; service = MarketDataService(); data = service.collect_from_exchanges(); print(f'✅ Generated {len(data)} market data records') if data else print('❌ Failed to generate market data')"
 
 services-test-infrastructure: ## Test infrastructure modules in Docker services
 	@echo "🔧 Testing infrastructure modules in Docker services..."
