@@ -42,13 +42,15 @@ graph TD
 
 ### **Importing in alphaloop_core**
 
+> Run examples from the repo root (e.g., `poetry run python ...`) so `infrastructure.*` resolves from `src/`.
+
 ```python
 # Direct imports (these are internal modules)
-from alphaloop_logging import AlphaLoopLogger, LoggingConfig
-from alphaloop_storage import create_database_manager, TableHandler
-from alphaloop_cache import CacheManager
-from alphaloop_heartbeat import HeartbeatGenerator
-from alphaloop_security import ConnectionAuthenticator
+from infrastructure.alphaloop_logging import AlphaLoopLogger, LoggingConfig
+from infrastructure.alphaloop_storage import create_database_manager, TableHandler
+from infrastructure.alphaloop_cache import CacheManager
+from infrastructure.alphaloop_heartbeat import HeartbeatGenerator
+from infrastructure.alphaloop_security import ConnectionAuthenticator
 ```
 
 ### **Using in Services**
@@ -118,8 +120,8 @@ python -m pytest tests/
 ### **Testing Integration with Core**
 
 ```bash
-# Test alphaloop_core services
-make test-core
+# Test infrastructure packages
+make test-infrastructure
 
 # Test Docker services
 make services-test-e2e

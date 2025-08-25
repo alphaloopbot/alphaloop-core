@@ -278,7 +278,7 @@ async def test_full_integration():
     logger = await service_factory.get_logger()
     cache_manager = await service_factory.get_cache_manager()
 
-    await logger.info("Integration test")
+    logger.info("Integration test")
     # Verify services interact correctly
 ```
 
