@@ -1,0 +1,49 @@
+# Big / irrelevant dirs
+node_modules/
+.venv/
+.env/
+dist/
+build/
+target/
+.out/
+.coverage/
+.site/
+docs/_build/
+.cache/
+
+# VCS + tooling noise
+.git/
+.gitignore
+.github/
+.idea/
+.vscode/
+*.log
+*.lock
+
+# Python
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.pyc
+*.pyo
+
+# Frontend bundles & assets
+*.min.js
+*.map
+*.bundle.*
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.webp
+*.mp4
+*.pdf
+
+# Data dumps
+*.parquet
+*.feather
+*.csv
+*.sqlite
+*.db

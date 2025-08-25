@@ -4,9 +4,9 @@ Basic test for AlphaLoop Cache package.
 """
 
 import asyncio
+from datetime import datetime
 import os
 import sys
-from datetime import datetime
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 

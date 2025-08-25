@@ -1,8 +1,8 @@
 """Tests for encryption module."""
 
-import pytest
 from alphaloop_security.encryption import DataEncryptor
 from alphaloop_security.exceptions import EncryptionError
+import pytest
 
 
 class TestDataEncryptor:

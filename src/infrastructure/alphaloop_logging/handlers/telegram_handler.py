@@ -4,6 +4,7 @@ import asyncio
 from typing import Any
 
 import aiohttp
+
 from infrastructure.alphaloop_logging.config.settings import LogLevel, TelegramConfig
 from infrastructure.alphaloop_logging.exceptions import TelegramError
 from infrastructure.alphaloop_logging.formatters.telegram_formatter import (

@@ -3,9 +3,10 @@
 from datetime import datetime
 from typing import Any
 
+from pydantic import BaseModel
+
 from infrastructure.alphaloop_cache.core.connection import CacheManager
 from infrastructure.alphaloop_cache.core.generic_cache import GenericCache
-from pydantic import BaseModel
 
 
 class PriceData(BaseModel):

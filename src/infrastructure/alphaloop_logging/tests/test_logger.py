@@ -1,10 +1,9 @@
 """Tests for AlphaLoop logger."""
 
-import tempfile
 from pathlib import Path
+import tempfile
 from unittest.mock import AsyncMock, Mock, patch
 
-import pytest
 from alphaloop_logging import (
     AlphaLoopLogger,
     FileConfig,
@@ -12,6 +11,7 @@ from alphaloop_logging import (
     LogLevel,
     TelegramConfig,
 )
+import pytest
 
 
 class TestAlphaLoopLogger:

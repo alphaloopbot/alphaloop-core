@@ -4,6 +4,7 @@ from collections.abc import Generator
 
 import httpx
 import pytest
+
 from alphaloop_core.config import settings
 
 

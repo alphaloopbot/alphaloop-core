@@ -47,9 +47,7 @@ class MarketDataService:
         # Configuration
         self.market_data_interval = int(os.getenv("MARKET_DATA_INTERVAL", 60))
         self.deployment_type = os.getenv("DEPLOYMENT_TYPE", "local")
-        self.cloud_sync_enabled = (
-            os.getenv("CLOUD_SYNC_ENABLED", "false").lower() == "true"
-        )
+        self.cloud_sync_enabled = os.getenv("CLOUD_SYNC_ENABLED", "false").lower() == "true"
         self.cloud_sync_interval = int(os.getenv("CLOUD_SYNC_INTERVAL", 300))
         self.cloud_api_url = os.getenv("CLOUD_API_URL", "")
 
@@ -109,9 +107,7 @@ class MarketDataService:
                 metadata_id = await self.metadata_handler.insert_data(metadata)
                 if metadata_id is not None:
                     if isinstance(metadata_id, list):
-                        metadata_ids[pair["symbol"]] = (
-                            metadata_id[0] if metadata_id else 1
-                        )
+                        metadata_ids[pair["symbol"]] = metadata_id[0] if metadata_id else 1
                     else:
                         metadata_ids[pair["symbol"]] = metadata_id
                 else:
@@ -156,9 +152,7 @@ class MarketDataService:
                     "metadata_id": self.metadata_ids[symbol],
                     "timestamp_id": int(time.time()),  # Convert to timestamp_id
                     "price": round(price, 8),
-                    "quote_volume24h": round(
-                        volume * 24, 8
-                    ),  # Match YAML schema column name
+                    "quote_volume24h": round(volume * 24, 8),  # Match YAML schema column name
                 }
             )
 
@@ -212,9 +206,7 @@ class MarketDataService:
 
                 return True
             else:
-                self.logger.error_sync(
-                    "Failed to store market data using infrastructure"
-                )
+                self.logger.error_sync("Failed to store market data using infrastructure")
                 return False
 
         except Exception as e:
@@ -231,9 +223,7 @@ class MarketDataService:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             try:
-                result = loop.run_until_complete(
-                    self.store_market_data_async(market_data)
-                )
+                result = loop.run_until_complete(self.store_market_data_async(market_data))
                 return result
             finally:
                 loop.close()

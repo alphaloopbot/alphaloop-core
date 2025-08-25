@@ -5,11 +5,12 @@ Tests both healthy and unhealthy heartbeat conditions.
 """
 
 import json
+from pathlib import Path
 import tempfile
 import time
-from pathlib import Path
 
 import pytest
+
 from infrastructure.alphaloop_heartbeat import (
     HeartbeatChecker,
     HeartbeatGenerator,

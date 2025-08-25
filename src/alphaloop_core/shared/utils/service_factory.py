@@ -98,9 +98,7 @@ class ServiceFactory:
     def get_encryptor(self) -> DataEncryptor:
         """Get data encryptor."""
         config = get_security_config()
-        return DataEncryptor(
-            passphrase=config["secret_key"], period_size=config["time_window"]
-        )
+        return DataEncryptor(passphrase=config["secret_key"], period_size=config["time_window"])
 
     def get_secure_url_composer(
         self,

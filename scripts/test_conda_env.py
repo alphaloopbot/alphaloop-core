@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Test script to verify conda environment setup."""
 
-import sys
 from importlib import import_module
+import sys
 
 
 def test_imports():

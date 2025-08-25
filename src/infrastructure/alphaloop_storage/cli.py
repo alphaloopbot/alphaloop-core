@@ -8,8 +8,8 @@ using alphaloop-storage as the single source of truth.
 
 import argparse
 import os
-import sys
 from pathlib import Path
+import sys
 
 # Add the src directory to the path so we can import alphaloop_storage
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))

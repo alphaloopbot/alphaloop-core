@@ -16,8 +16,8 @@ Key Features:
 - Cross-platform time handling
 """
 
-import time
 from datetime import UTC, datetime
+import time
 
 
 def get_current_timestamp() -> float:

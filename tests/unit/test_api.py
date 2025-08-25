@@ -1,7 +1,8 @@
 """Unit tests for the API module."""
 
-from alphaloop_core.api import app
 from fastapi.testclient import TestClient
+
+from alphaloop_core.api import app
 
 client = TestClient(app)
 

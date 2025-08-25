@@ -1,7 +1,7 @@
 """Tests for authentication module."""
 
-import pytest
 from alphaloop_security.auth import ConnectionAuthenticator
+import pytest
 
 
 class TestConnectionAuthenticator:

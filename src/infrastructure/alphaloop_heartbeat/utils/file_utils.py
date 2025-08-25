@@ -247,8 +247,8 @@ def get_heartbeat_file_info(heartbeat_file: Path) -> dict:
         File exists: True
         File size: 156 bytes
     """
-    import json
     from datetime import datetime
+    import json
 
     info: dict = {
         "exists": heartbeat_file.exists(),

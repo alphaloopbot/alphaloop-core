@@ -63,32 +63,21 @@ addopts = [
 ]
 
 [tool.ruff]
-target-version = "py312"
+src = ["src", "tests"]
 line-length = 100
 
 [tool.ruff.lint]
-select = [
-    "E",  # pycodestyle errors
-    "W",  # pycodestyle warnings
-    "F",  # pyflakes
-    "I",  # isort
-    "B",  # flake8-bugbear
-    "C4", # flake8-comprehensions
-    "UP", # pyupgrade
-]
-ignore = [
-    "E501",  # line too long (handled by formatter when possible)
-    "B008",  # do not perform function calls in argument defaults
-    "C901",  # too complex
-    "E731",  # lambda assigned to name (refactor later)
-    "UP040", # TypeAlias -> `type` keyword (refactor later)
-]
+select = ["E", "F", "I", "B", "UP"]
+fixable = ["I"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["alphaloop_core", "infrastructure"]
+force-sort-within-sections = true
+combine-as-imports = true
 
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
-skip-magic-trailing-comma = false
-line-ending = "auto"
 
 [tool.mypy]
 python_version = "3.12"

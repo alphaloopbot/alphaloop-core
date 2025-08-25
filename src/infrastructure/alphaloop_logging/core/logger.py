@@ -20,8 +20,8 @@ Key Features:
 """
 
 import asyncio
-import inspect
 from datetime import datetime
+import inspect
 from typing import Any
 
 from infrastructure.alphaloop_logging.config.settings import LoggingConfig, LogLevel

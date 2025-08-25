@@ -8,9 +8,9 @@ with file logging, console output, and Telegram integration.
 
 import asyncio
 import os
+from pathlib import Path
 import sys
 import tempfile
-from pathlib import Path
 
 # Add the infrastructure directory to the path
 sys.path.insert(

@@ -1,8 +1,8 @@
 """Data integrity validation utilities."""
 
+from dataclasses import dataclass
 import hashlib
 import json
-from dataclasses import dataclass
 from typing import Any
 
 from .exceptions import IntegrityError

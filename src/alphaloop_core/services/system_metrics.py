@@ -6,15 +6,15 @@ Uses alphaloop infrastructure packages for logging, storage, and heartbeat monit
 """
 
 import asyncio
+from datetime import datetime
 import os
 import time
-from datetime import datetime
 from typing import Any
 
-import psutil
 from alphaloop_heartbeat import HeartbeatGenerator
 from alphaloop_logging import AlphaLoopLogger, LoggingConfig
 from alphaloop_storage import TableHandler, create_database_manager
+import psutil
 
 
 class SystemMetricsService:

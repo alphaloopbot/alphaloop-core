@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml  # type: ignore
+
 from alphaloop_core.shared.exceptions.validation_exceptions import (
     ValidationError as ConfigurationError,
 )
