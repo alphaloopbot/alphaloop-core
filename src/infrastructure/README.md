@@ -1,6 +1,6 @@
 # AlphaLoop Infrastructure Modules
 
-This directory contains **internal infrastructure modules** that provide essential services for the AlphaLoop system. These are **not separate packages** - they are internal Python modules used by `alphaloop-core`.
+This directory contains **internal infrastructure modules** that provide essential services for the AlphaLoop system. These are **not separate packages** - they are internal Python modules used by `alphaloop_core`.
 
 ## 📦 Module Overview
 
@@ -16,7 +16,7 @@ This directory contains **internal infrastructure modules** that provide essenti
 
 ```mermaid
 graph TD
-    A[alphaloop-core] --> B[alphaloop_heartbeat]
+    A[alphaloop_core] --> B[alphaloop_heartbeat]
     A --> C[alphaloop_logging]
     A --> D[alphaloop_security]
     A --> E[alphaloop_storage]
@@ -33,14 +33,14 @@ graph TD
 ```
 
 ### **Module Dependencies**
-- **alphaloop-core** imports all infrastructure modules
+- **alphaloop_core** imports all infrastructure modules
 - **alphaloop_storage** may use **alphaloop_cache** for caching
 - **No circular dependencies** between modules
-- **Internal modules** - not meant to be used outside alphaloop-core
+- **Internal modules** - not meant to be used outside alphaloop_core
 
 ## 🚀 Usage
 
-### **Importing in alphaloop-core**
+### **Importing in alphaloop_core**
 
 ```python
 # Direct imports (these are internal modules)
@@ -118,7 +118,7 @@ python -m pytest tests/
 ### **Testing Integration with Core**
 
 ```bash
-# Test alphaloop-core services
+# Test alphaloop_core services
 make test-core
 
 # Test Docker services
@@ -136,11 +136,11 @@ make services-test-e2e
 ## 🎯 Key Points
 
 - **These are internal modules**, not separate packages
-- **No installation needed** - they're part of alphaloop-core
-- **No versioning** - they evolve with alphaloop-core
+- **No installation needed** - they're part of alphaloop_core
+- **No versioning** - they evolve with alphaloop_core
 - **No independent deployment** - they're used by Docker services
 - **Simple imports** - direct Python module imports
 
 ---
 
-**🎯 Goal**: These infrastructure modules provide a solid foundation for alphaloop-core services while maintaining clean separation of concerns and reusability within the project.
+**🎯 Goal**: These infrastructure modules provide a solid foundation for alphaloop_core services while maintaining clean separation of concerns and reusability within the project.
