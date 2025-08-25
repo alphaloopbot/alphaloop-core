@@ -20,7 +20,7 @@ from alphaloop_storage import TableHandler, create_database_manager
 class SystemMetricsService:
     """System metrics collection service using alphaloop infrastructure."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the system metrics service with infrastructure components."""
         # Initialize infrastructure components
         logging_config = LoggingConfig.from_env(app_name="system-metrics-service")
@@ -51,7 +51,7 @@ class SystemMetricsService:
             f"System Metrics Service initialized (interval: {self.metrics_interval}s)"
         )
 
-    async def _get_or_create_metadata(self) -> int:
+    async def _get_or_create_metadata(self) -> int | None:
         """Get existing metadata or create new one for this host."""
         try:
             hostname = os.getenv("HOST_HOSTNAME", "unknown")

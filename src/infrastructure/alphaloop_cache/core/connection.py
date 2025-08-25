@@ -194,7 +194,9 @@ class CacheManager:
             count = 0
             cursor = 0
             while True:
-                cursor, keys = await self.redis_client.scan(cursor=cursor, match=pattern, count=1000)
+                cursor, keys = await self.redis_client.scan(
+                    cursor=cursor, match=pattern, count=1000
+                )
                 count += len(keys)
                 if cursor == 0:
                     break

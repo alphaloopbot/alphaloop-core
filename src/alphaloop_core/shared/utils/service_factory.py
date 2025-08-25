@@ -1,5 +1,7 @@
 """Service factory for AlphaLoop Core using official infrastructure packages."""
 
+from typing import Any
+
 from infrastructure.alphaloop_cache import CacheManager, PubSubManager
 from infrastructure.alphaloop_heartbeat import HeartbeatChecker, HeartbeatGenerator
 from infrastructure.alphaloop_logging import AlphaLoopLogger
@@ -67,7 +69,7 @@ class ServiceFactory:
             self._heartbeat_checker = HeartbeatChecker(config)
         return self._heartbeat_checker
 
-    async def get_price_cache(self):
+    async def get_price_cache(self) -> Any:
         """Get or create price cache service."""
         from alphaloop_core.services.cache import PriceCacheService
 
@@ -96,7 +98,9 @@ class ServiceFactory:
     def get_encryptor(self) -> DataEncryptor:
         """Get data encryptor."""
         config = get_security_config()
-        return DataEncryptor(passphrase=config["secret_key"], period_size=config["time_window"])
+        return DataEncryptor(
+            passphrase=config["secret_key"], period_size=config["time_window"]
+        )
 
     def get_secure_url_composer(
         self,

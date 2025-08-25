@@ -36,4 +36,4 @@ class BaseFormatter(ABC):
         if len(message) <= max_length:
             return message
         # Use a single character ellipsis to stay within max_length
-        return f"{message[:max_length-1]}…"
+        return f"{message[: max_length - 1]}…"

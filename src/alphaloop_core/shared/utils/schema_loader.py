@@ -28,9 +28,7 @@ class DatabaseSchemaLoader:
             return self._schema
 
         if not self.config_path.exists():
-            raise ConfigurationError(
-                f"Schema configuration file not found: {self.config_path}"
-            )
+            raise ConfigurationError(f"Schema configuration file not found: {self.config_path}")
 
         try:
             with open(self.config_path, encoding="utf-8") as f:
@@ -39,9 +37,7 @@ class DatabaseSchemaLoader:
                     raise ConfigurationError("Schema configuration file is empty")
                 self._schema = loaded_schema
         except yaml.YAMLError as e:
-            raise ConfigurationError(
-                f"Invalid YAML in schema configuration: {e}"
-            ) from e
+            raise ConfigurationError(f"Invalid YAML in schema configuration: {e}") from e
         except Exception as e:
             raise ConfigurationError(f"Failed to load schema configuration: {e}") from e
 
@@ -71,9 +67,7 @@ class DatabaseSchemaLoader:
                 if "type" not in table_config:
                     raise ConfigurationError(f"Table {table_name} missing 'type' field")
                 if "columns" not in table_config:
-                    raise ConfigurationError(
-                        f"Table {table_name} missing 'columns' field"
-                    )
+                    raise ConfigurationError(f"Table {table_name} missing 'columns' field")
 
     def get_database_config(self, database_name: str) -> dict[str, Any]:
         """Get configuration for a specific database."""
@@ -109,9 +103,7 @@ class DatabaseSchemaLoader:
                 # Check if table has policies for this system
                 policies = table_config.get("policies", {})
                 for policy_name, policy_config in policies.items():
-                    if policy_name == system_name or policy_name.startswith(
-                        f"{system_name}_"
-                    ):
+                    if policy_name == system_name or policy_name.startswith(f"{system_name}_"):
                         full_table_name = (
                             f"{table_name}_{policy_config.get('suffix_name', '')}"
                             if policy_config.get("suffix_name")
@@ -139,8 +131,7 @@ class DatabaseSchemaLoader:
                 for policy_name, policy_config in policies.items():
                     # Filter by system if specified
                     if system_name and not (
-                        policy_name == system_name
-                        or policy_name.startswith(f"{system_name}_")
+                        policy_name == system_name or policy_name.startswith(f"{system_name}_")
                     ):
                         continue
 

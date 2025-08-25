@@ -149,12 +149,12 @@ class QueryBuilder:
     def create_insert_query(cls, table_name: str, data: dict[str, Any]) -> tuple[str, list[Any]]:
         """Create an INSERT query with parameterized values."""
         columns = list(data.keys())
-        placeholders = [f"${i+1}" for i in range(len(columns))]
+        placeholders = [f"${i + 1}" for i in range(len(columns))]
         values = list(data.values())
 
         query = f"""
-            INSERT INTO {table_name} ({', '.join(columns)})
-            VALUES ({', '.join(placeholders)})
+            INSERT INTO {table_name} ({", ".join(columns)})
+            VALUES ({", ".join(placeholders)})
             RETURNING id;
         """
 
@@ -165,7 +165,7 @@ class QueryBuilder:
         cls, table_name: str, data: dict[str, Any], where_conditions: dict[str, Any]
     ) -> tuple[str, list[Any]]:
         """Create an UPDATE query with parameterized values."""
-        set_clauses = [f"{column} = ${i+1}" for i, column in enumerate(data.keys())]
+        set_clauses = [f"{column} = ${i + 1}" for i, column in enumerate(data.keys())]
         where_clauses = []
         values = list(data.values())
 
@@ -177,8 +177,8 @@ class QueryBuilder:
 
         query = f"""
             UPDATE {table_name}
-            SET {', '.join(set_clauses)}
-            WHERE {' AND '.join(where_clauses)}
+            SET {", ".join(set_clauses)}
+            WHERE {" AND ".join(where_clauses)}
             RETURNING id;
         """
 
@@ -193,12 +193,12 @@ class QueryBuilder:
         values = []
 
         for i, (column, value) in enumerate(where_conditions.items()):
-            where_clauses.append(f"{column} = ${i+1}")
+            where_clauses.append(f"{column} = ${i + 1}")
             values.append(value)
 
         query = f"""
             DELETE FROM {table_name}
-            WHERE {' AND '.join(where_clauses)}
+            WHERE {" AND ".join(where_clauses)}
             RETURNING id;
         """
 

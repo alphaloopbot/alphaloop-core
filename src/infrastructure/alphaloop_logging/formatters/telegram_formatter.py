@@ -60,7 +60,7 @@ class TelegramFormatter(BaseFormatter):
 
         # Truncate message if too long
         if len(message) > self.max_message_length:
-            message = f"{message[:self.max_message_length]}..."
+            message = f"{message[: self.max_message_length]}..."
 
         # Get level style
         level_info = self.LEVEL_STYLES.get(level, self.LEVEL_STYLES["INFO"])

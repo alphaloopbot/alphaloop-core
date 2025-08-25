@@ -113,22 +113,22 @@ def generate_llm_prompt(comments: list[dict[str, Any]], analysis: dict[str, Any]
     prompt = f"""# PR Code Review Analysis
 
 ## Summary
-- **Total Comments**: {analysis['total_comments']}
-- **Commenters**: {', '.join(analysis['commenters'])}
-- **Files Affected**: {len(analysis['files_affected'])} files
+- **Total Comments**: {analysis["total_comments"]}
+- **Commenters**: {", ".join(analysis["commenters"])}
+- **Files Affected**: {len(analysis["files_affected"])} files
 
 ## Comment Types
-- Refactor Suggestions: {analysis['suggestion_types']['refactor']}
-- Bug Fixes: {analysis['suggestion_types']['bug']}
-- Security Issues: {analysis['suggestion_types']['security']}
-- Performance: {analysis['suggestion_types']['performance']}
-- Documentation: {analysis['suggestion_types']['documentation']}
-- Other: {analysis['suggestion_types']['other']}
+- Refactor Suggestions: {analysis["suggestion_types"]["refactor"]}
+- Bug Fixes: {analysis["suggestion_types"]["bug"]}
+- Security Issues: {analysis["suggestion_types"]["security"]}
+- Performance: {analysis["suggestion_types"]["performance"]}
+- Documentation: {analysis["suggestion_types"]["documentation"]}
+- Other: {analysis["suggestion_types"]["other"]}
 
 ## Severity Distribution
-- High Priority: {analysis['severity_levels']['high']}
-- Medium Priority: {analysis['severity_levels']['medium']}
-- Low Priority: {analysis['severity_levels']['low']}
+- High Priority: {analysis["severity_levels"]["high"]}
+- Medium Priority: {analysis["severity_levels"]["medium"]}
+- Low Priority: {analysis["severity_levels"]["low"]}
 
 ## Detailed Comments
 
@@ -136,12 +136,12 @@ def generate_llm_prompt(comments: list[dict[str, Any]], analysis: dict[str, Any]
 
     for i, comment in enumerate(comments, 1):
         prompt += f"""### Comment {i}
-**File**: {comment.get('path', 'Unknown')}
-**Line**: {comment.get('line', 'Unknown')}
-**Author**: {comment.get('user', {}).get('login', 'Unknown')}
-**Type**: {comment.get('subject_type', 'Unknown')}
+**File**: {comment.get("path", "Unknown")}
+**Line**: {comment.get("line", "Unknown")}
+**Author**: {comment.get("user", {}).get("login", "Unknown")}
+**Type**: {comment.get("subject_type", "Unknown")}
 
-{comment.get('body', 'No body')}
+{comment.get("body", "No body")}
 
 ---
 """

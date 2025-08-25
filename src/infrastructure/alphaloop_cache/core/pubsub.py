@@ -139,7 +139,7 @@ class PubSubManager:
                 # Remove specific handler
                 handlers = self._handlers[channel]
                 for i, handler in enumerate(handlers):
-                    if f"subscriber_{i+1}" == handler_id:
+                    if f"subscriber_{i + 1}" == handler_id:
                         handler.is_active = False
                         handlers.pop(i)
                         break

@@ -81,7 +81,7 @@ async def demo_file_logging():
 
         # Generate some log entries
         for i in range(10):
-            await logger.info(f"Log entry number {i+1}", info=f"iteration_{i+1}")
+            await logger.info(f"Log entry number {i + 1}", info=f"iteration_{i + 1}")
             # Add some bulk to trigger rotation
             await logger.info("x" * 100, info="bulk_data")
 

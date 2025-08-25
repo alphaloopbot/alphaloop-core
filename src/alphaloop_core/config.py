@@ -51,8 +51,8 @@ def settings() -> MappingProxyType[str, str]:
         # DATABASE_URL fallback composed from individual DB_* vars to prevent drift
         "DATABASE_URL": os.getenv(
             "DATABASE_URL",
-            f"postgresql://{os.getenv('DB_USER','postgres')}:{os.getenv('DB_PASSWORD','password')}"
-            f"@{os.getenv('DB_HOST','localhost')}:{os.getenv('DB_PORT','5432')}/{os.getenv('DB_NAME','alphaloop')}",
+            f"postgresql://{os.getenv('DB_USER', 'postgres')}:{os.getenv('DB_PASSWORD', 'password')}"
+            f"@{os.getenv('DB_HOST', 'localhost')}:{os.getenv('DB_PORT', '5432')}/{os.getenv('DB_NAME', 'alphaloop')}",
         ),
         # Default currency for market data and trading operations
         "DEFAULT_CURRENCY": os.getenv("DEFAULT_CURRENCY", "USDT"),
