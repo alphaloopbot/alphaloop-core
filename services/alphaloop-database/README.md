@@ -37,6 +37,7 @@ PostgreSQL database service for AlphaLoop Core with separate databases for syste
 |----------------------|-------------------------------------|---------------------|
 | `POSTGRES_USER`      | PostgreSQL superuser                | `postgres`          |
 | `POSTGRES_PASSWORD`  | PostgreSQL superuser password       | -                   |
+| `DB_POSTGRES_NAME`   | Default maintenance database        | `postgres`          |
 | `DB_SYS_USER`        | System database user                | `alphaloop_sys`     |
 | `DB_SYS_PASSWORD`    | System database password            | -                   |
 | `DB_MARKET_USER`     | Market database user                | `alphaloop_market`  |

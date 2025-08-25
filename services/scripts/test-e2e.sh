@@ -39,60 +39,72 @@ run_test() {
 # Check if services are running
 check_services_running() {
     echo -e "\n${YELLOW}📋 Checking if services are running...${NC}"
-    cd services
+    (
+        cd services
 
-    # Check if containers exist and are running
-    if ! docker-compose ps | grep -q "alphaloop-database.*Up"; then
-        echo -e "${RED}❌ Database service is not running${NC}"
-        return 1
-    fi
+        # Check if containers exist and are running
+        if ! docker-compose ps | grep -q "alphaloop-database.*Up"; then
+            echo -e "${RED}❌ Database service is not running${NC}"
+            exit 1
+        fi
 
-    if ! docker-compose ps | grep -q "alphaloop-system-metrics.*Up"; then
-        echo -e "${RED}❌ System metrics service is not running${NC}"
-        return 1
-    fi
+        if ! docker-compose ps | grep -q "alphaloop-system-metrics.*Up"; then
+            echo -e "${RED}❌ System metrics service is not running${NC}"
+            exit 1
+        fi
 
-    if ! docker-compose ps | grep -q "alphaloop-market-data-local.*Up"; then
-        echo -e "${RED}❌ Market data service is not running${NC}"
-        return 1
-    fi
+        if ! docker-compose ps | grep -q "alphaloop-market-data-local.*Up"; then
+            echo -e "${RED}❌ Market data service is not running${NC}"
+            exit 1
+        fi
 
-    echo -e "${GREEN}✅ All services are running${NC}"
-    return 0
+        echo -e "${GREEN}✅ All services are running${NC}"
+    )
+    return $?
 }
 
 # Database Tests
 test_database_connectivity() {
-    cd services
-    docker-compose exec -T alphaloop-database pg_isready -U postgres
+    (
+        cd services
+        docker-compose exec -T alphaloop-database pg_isready -U postgres
+    )
 }
 
 test_database_databases() {
-    cd services
-    # Test market database
-    docker-compose exec -T alphaloop-database psql -U postgres -d alphaloop_market -c "SELECT current_database();" > /dev/null
-    # Test system database
-    docker-compose exec -T alphaloop-database psql -U postgres -d alphaloop_sys -c "SELECT current_database();" > /dev/null
+    (
+        cd services
+        # Test market database
+        docker-compose exec -T alphaloop-database psql -U postgres -d alphaloop_market -c "SELECT current_database();" > /dev/null
+        # Test system database
+        docker-compose exec -T alphaloop-database psql -U postgres -d alphaloop_sys -c "SELECT current_database();" > /dev/null
+    )
 }
 
 test_database_permissions() {
-    cd services
-    # Test market user
-    docker-compose exec -T alphaloop-database psql -U alphaloop_market -d alphaloop_market -c "SELECT 1;" > /dev/null
-    # Test system user
-    docker-compose exec -T alphaloop-database psql -U alphaloop_sys -d alphaloop_sys -c "SELECT 1;" > /dev/null
+    (
+        cd services
+        # Test market user
+        docker-compose exec -T alphaloop-database psql -U alphaloop_market -d alphaloop_market -c "SELECT 1;" > /dev/null
+        # Test system user
+        docker-compose exec -T alphaloop-database psql -U alphaloop_sys -d alphaloop_sys -c "SELECT 1;" > /dev/null
+    )
 }
 
 # System Metrics Tests
 test_system_metrics_process() {
-    cd services
-    docker-compose exec -T alphaloop-system-metrics python -c "import psutil; print('System metrics process is running')"
+    (
+        cd services
+        docker-compose exec -T alphaloop-system-metrics python -c "import psutil; print('System metrics process is running')"
+    )
 }
 
 test_system_metrics_logs() {
-    cd services
-    # Check if logs are being generated
-    docker-compose logs alphaloop-system-metrics | grep -q "metrics" || return 1
+    (
+        cd services
+        # Check if logs are being generated
+        docker-compose logs alphaloop-system-metrics | grep -q "metrics" || exit 1
+    )
 }
 
 # Market Data Tests
@@ -113,10 +125,11 @@ test_market_data_database_connection() {
 # Integration Tests
 test_service_communication() {
     # Test if services can communicate with each other
-    cd services
+    (
+        cd services
 
-    # Test if system metrics can connect to database
-    docker-compose exec -T alphaloop-system-metrics python -c "
+        # Test if system metrics can connect to database
+        docker-compose exec -T alphaloop-system-metrics python -c "
 import psycopg2
 import os
 try:
@@ -127,16 +140,19 @@ except Exception as e:
     print(f'Database connection failed: {e}')
     exit(1)
 "
+    )
 }
 
 test_data_flow() {
     # Test if data is flowing through the system
-    cd services
+    (
+        cd services
 
-    # Check if system metrics are being written to database
-    docker-compose exec -T alphaloop-database psql -U postgres -d alphaloop_sys -c "
+        # Check if system metrics are being written to database
+        docker-compose exec -T alphaloop-database psql -U postgres -d alphaloop_sys -c "
 SELECT COUNT(*) FROM system_metrics WHERE created_at > NOW() - INTERVAL '5 minutes';
 " | grep -v "count" | grep -v "---" | grep -v "rows" | grep -q "[0-9]"
+    )
 }
 
 # Performance Tests

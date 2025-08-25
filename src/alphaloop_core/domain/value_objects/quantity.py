@@ -9,7 +9,7 @@ from ...shared.exceptions.validation_exceptions import InvalidQuantityError
 class Quantity:
     """Immutable value object representing trade quantities."""
 
-    def __init__(self, value: str | float | Decimal, precision: int = 8) -> None:
+    def __init__(self, value: str | float | int | Decimal, precision: int = 8) -> None:
         """Initialize Quantity with value and precision."""
         self._precision = precision
 

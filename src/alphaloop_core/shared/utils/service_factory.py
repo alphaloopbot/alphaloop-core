@@ -29,7 +29,7 @@ class ServiceFactory:
         self._cache_manager: CacheManager | None = None
         self._database_manager: DatabaseManager | None = None
         self._logger: AlphaLoopLogger | None = None
-        self._heartbeat_generator: HeartbeatGenerator | None = None
+        self._heartbeat_generators: dict[str, HeartbeatGenerator] = {}
         self._heartbeat_checker: HeartbeatChecker | None = None
 
     async def get_cache_manager(self) -> CacheManager:
@@ -56,11 +56,13 @@ class ServiceFactory:
     async def get_heartbeat_generator(
         self, service_name: str = "alphaloop-core"
     ) -> HeartbeatGenerator:
-        """Get or create heartbeat generator."""
-        if self._heartbeat_generator is None:
+        """Get or create heartbeat generator (per service name)."""
+        gen = self._heartbeat_generators.get(service_name)
+        if gen is None:
             config = get_heartbeat_config()
-            self._heartbeat_generator = HeartbeatGenerator(service_name, config)
-        return self._heartbeat_generator
+            gen = HeartbeatGenerator(service_name, config)
+            self._heartbeat_generators[service_name] = gen
+        return gen
 
     async def get_heartbeat_checker(self) -> HeartbeatChecker:
         """Get or create heartbeat checker."""

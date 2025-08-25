@@ -247,7 +247,7 @@ docker compose down
 ### Services
 
 - **API**: FastAPI application on port 8000
-- **Database**: PostgreSQL 15 on port 5432
+- **Database**: PostgreSQL 16.4 on port 5432
 
 ## 🔐 Configuration
 
