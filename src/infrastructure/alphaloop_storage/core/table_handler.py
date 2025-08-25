@@ -151,9 +151,12 @@ class TableHandler:
         if table_spec.get("type") == "data":
             # Create common indexes for data tables
             indexes = [
-                f"CREATE INDEX IF NOT EXISTS idx_{self.table_name}_timestamp ON {self.table_name}(timestamp_id);",
-                f"CREATE INDEX IF NOT EXISTS idx_{self.table_name}_metadata_id ON {self.table_name}(metadata_id);",
-                f"CREATE INDEX IF NOT EXISTS idx_{self.table_name}_metadata_timestamp ON {self.table_name}(metadata_id, timestamp_id);",
+                f"CREATE INDEX IF NOT EXISTS idx_{self.table_name}_timestamp ON "
+                f"{self.table_name}(timestamp_id);",
+                f"CREATE INDEX IF NOT EXISTS idx_{self.table_name}_metadata_id ON "
+                f"{self.table_name}(metadata_id);",
+                f"CREATE INDEX IF NOT EXISTS idx_{self.table_name}_metadata_timestamp ON "
+                f"{self.table_name}(metadata_id, timestamp_id);",
             ]
 
             for index_sql in indexes:

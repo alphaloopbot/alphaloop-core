@@ -111,7 +111,8 @@ class SchemaGenerator:
                 [
                     f"CREATE INDEX idx_{table_name}_timestamp ON {table_name}(timestamp_id);",
                     f"CREATE INDEX idx_{table_name}_metadata_id ON {table_name}(metadata_id);",
-                    f"CREATE INDEX idx_{table_name}_metadata_timestamp ON {table_name}(metadata_id, timestamp_id);",
+                    f"CREATE INDEX idx_{table_name}_metadata_timestamp ON "
+                    f"{table_name}(metadata_id, timestamp_id);",
                 ]
             )
 

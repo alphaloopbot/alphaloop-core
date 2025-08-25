@@ -28,7 +28,7 @@ def load_environment() -> None:
 
 @lru_cache
 def get_database_url() -> str:
-    """Get the database URL from environment variables (DEPRECATED: Use alphaloop-storage package)."""
+    """Get the database URL from environment variables (DEPRECATED)."""
     import warnings
 
     warnings.warn(

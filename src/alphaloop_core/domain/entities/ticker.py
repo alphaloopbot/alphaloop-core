@@ -10,7 +10,7 @@ from .base import Entity
 
 
 class Ticker(Entity):
-    """Represents a trading pair (e.g., BTC/USD) with properties like symbol, base currency, quote currency, exchange."""
+    """Represents a trading pair with symbol, base/quote currencies, and exchange info."""
 
     def __init__(
         self,

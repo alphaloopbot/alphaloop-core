@@ -126,7 +126,8 @@ def demo_deserialization():
 
     market_data_default = MarketData.from_dict(data_without_currency)
     print(
-        f"💰 Deserialized without currency (uses default): {market_data_default.price.currency.value}"
+        f"💰 Deserialized without currency (uses default): "
+        f"{market_data_default.price.currency.value}"
     )
 
     return market_data_from_dict, market_data_default
