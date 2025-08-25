@@ -1,4 +1,4 @@
-.PHONY: help install dev test test-integration integration lint type-check format clean start stop logs restart restart-no-cache wait-for-services status export-pr-comments analyze-pr-comments analyze-pr-comments-latest export-and-analyze-pr export-and-analyze-pr-latest
+.PHONY: help install dev test test-integration integration lint type-check format format-check format-fix clean start stop logs restart restart-no-cache wait-for-services status export-pr-comments analyze-pr-comments analyze-pr-comments-latest export-and-analyze-pr export-and-analyze-pr-latest
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -14,8 +14,8 @@ dev: ## Install development dependencies and run full development cycle
 	poetry install --with dev
 	pre-commit install
 	@echo "Running full development cycle..."
-	@echo "1. Formatting code..."
-	@$(MAKE) format
+	@echo "1. Fixing formatting issues..."
+	@$(MAKE) format-fix
 	@echo "2. Running linting..."
 	@$(MAKE) lint
 	@echo "3. Running type checking..."
@@ -71,8 +71,21 @@ type-check: ## Run type checking with smart filtering
 	poetry run mypy src/alphaloop_core/ --ignore-missing-imports --disable-error-code=misc --disable-error-code=unused-ignore --disable-error-code=unreachable --disable-error-code=no-any-return --disable-error-code=dict-item --disable-error-code=attr-defined --disable-error-code=index --disable-error-code=var-annotated --disable-error-code=operator --disable-error-code=call-overload --disable-error-code=union-attr --disable-error-code=no-untyped-def --disable-error-code=safe-super
 
 format: ## Format code
+	@echo "🔧 Formatting code..."
 	poetry run ruff format .
 	poetry run ruff check --fix .
+	@echo "✅ Code formatting complete!"
+
+format-check: ## Check formatting without fixing
+	@echo "🔍 Checking code formatting..."
+	poetry run ruff format --check .
+	poetry run ruff check .
+	@echo "✅ Code formatting check complete!"
+
+format-fix: ## Fix all formatting issues automatically
+	@echo "🔧 Running comprehensive formatting fixes..."
+	python scripts/fix-formatting.py
+	@echo "✅ All formatting issues fixed!"
 
 clean: ## Clean up build artifacts
 	find . -type d -name "__pycache__" -exec rm -rf {} +

@@ -14,7 +14,19 @@ repos:
     hooks:
       - id: ruff
         args: [--fix]
+        description: "Lint and auto-fix Python code (imports, formatting, line length, etc.)"
       - id: ruff-format
+        description: "Format Python code with consistent style"
+
+  # Custom formatting script for additional fixes
+  - repo: local
+    hooks:
+      - id: fix-formatting
+        name: Fix formatting issues
+        entry: python scripts/fix-formatting.py
+        language: python
+        types: [python]
+        description: "Run custom formatting fixes for line length and other issues"
 
   # MyPy with smart filtering - ignores framework limitations, focuses on business logic
   - repo: https://github.com/pre-commit/mirrors-mypy
