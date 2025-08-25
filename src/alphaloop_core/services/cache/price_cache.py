@@ -83,6 +83,9 @@ class PriceCacheService:
 
             if success:
                 await self._update_price_index(price_data.symbol, price_data.exchange)
+                # Also write a history entry with a time-suffixed key for retrieval by pattern
+                history_key = f"{key}:{int(price_data.timestamp.timestamp())}"
+                await self.generic_cache.set_data(history_key, value, ttl)
 
             return success
         except Exception as e:

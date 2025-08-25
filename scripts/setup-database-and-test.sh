@@ -372,8 +372,16 @@ asyncio.run(collect_market_data())
 " &
 MARKET_DATA_PID=$!
 
-# Wait for collection to complete
-sleep 35
+# Wait for collection to complete with timeout protection
+wait "$SYSTEM_METRICS_PID"
+METRICS_RC=$?
+wait "$MARKET_DATA_PID"
+MARKET_RC=$?
+
+if [[ $METRICS_RC -ne 0 || $MARKET_RC -ne 0 ]]; then
+  echo -e "${RED}❌ Continuous collection failed (metrics=$METRICS_RC, market=$MARKET_RC)${NC}"
+  exit 1
+fi
 
 # Check final data counts
 echo -e "${BLUE}Final data verification...${NC}"
