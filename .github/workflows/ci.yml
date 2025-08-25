@@ -81,12 +81,14 @@ jobs:
         conda activate alphaloop-core
         poetry install --no-interaction
         pip install -e .
+        export PYTHONPATH="${PYTHONPATH}:${PWD}/src"
 
     - name: Test conda environment
       run: |
         conda init bash
         source ~/.bashrc
         conda activate alphaloop-core
+        export PYTHONPATH="${PYTHONPATH}:${PWD}/src"
         python scripts/test_conda_env.py
 
     - name: Run tests in conda environment
@@ -94,4 +96,5 @@ jobs:
         conda init bash
         source ~/.bashrc
         conda activate alphaloop-core
+        export PYTHONPATH="${PYTHONPATH}:${PWD}/src"
         poetry run pytest tests/unit/ -v
