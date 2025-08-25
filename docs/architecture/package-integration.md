@@ -15,14 +15,14 @@ structlog = "^23.2.0"    # Direct logging implementation
 psutil = "^5.9"          # Direct system monitoring
 ```
 
-### ✅ **After: Official Package Dependencies**
+### ✅ **After: Local Infrastructure Modules**
 ```toml
-# pyproject.toml - Official infrastructure packages
-alphaloop-heartbeat = {path = "infrastructure/alphaloop-heartbeat"}
-alphaloop-security = {path = "infrastructure/alphaloop-security"}
-alphaloop-logging = {path = "infrastructure/alphaloop-logging"}
-alphaloop-storage = {path = "infrastructure/alphaloop-storage"}
-alphaloop-cache = {path = "infrastructure/alphaloop-cache"}
+# pyproject.toml - Local, internal infrastructure modules
+alphaloop_heartbeat = { path = "src/infrastructure/alphaloop_heartbeat" }
+alphaloop_security  = { path = "src/infrastructure/alphaloop_security" }
+alphaloop_logging   = { path = "src/infrastructure/alphaloop_logging" }
+alphaloop_storage   = { path = "src/infrastructure/alphaloop_storage" }
+alphaloop_cache     = { path = "src/infrastructure/alphaloop_cache" }
 ```
 
 ## Package Integration Architecture
@@ -124,8 +124,8 @@ cache_manager = await service_factory.get_cache_manager()
 heartbeat_generator = await service_factory.get_heartbeat_generator("my-service")
 
 # Use services
-await logger.info("Application started")
-await cache_manager.set_key("test", "value")
+logger.info("Application started")
+cache_manager.set("test", "value")
 await heartbeat_generator.generate_heartbeat()
 ```
 
@@ -256,14 +256,15 @@ print(f"Storage config: {configs['storage']}")
 ### **Unit Testing**
 ```python
 import pytest
-from unittest.mock import AsyncMock, patch
+from unittest.mock import patch
 from alphaloop_core import service_factory
 
 @pytest.mark.asyncio
 async def test_cache_integration():
-    with patch('alphaloop_cache.CacheManager') as mock_cache:
+    with patch('alphaloop_core.shared.utils.service_factory.CacheManager', autospec=True) as MockCacheManager:
         cache_manager = await service_factory.get_cache_manager()
-        assert isinstance(cache_manager, AsyncMock)
+        MockCacheManager.assert_called_once()
+        assert cache_manager is MockCacheManager.return_value
 ```
 
 ### **Integration Testing**
@@ -301,9 +302,9 @@ SECURITY_SECRET_KEY=your-secret-key
 SECURITY_ENCRYPTION_KEY=your-encryption-key
 
 # Storage Configuration
-DATABASE_HOST=localhost
-DATABASE_PORT=5432
-DATABASE_NAME=alphaloop
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=alphaloop
 
 # Heartbeat Configuration
 HEARTBEAT_INTERVAL=60

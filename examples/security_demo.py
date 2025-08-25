@@ -37,27 +37,47 @@ def demo_authentication():
         passphrase="demo-secret-passphrase", period_size=5, num_sequential_hashes=3
     )
 
-    # Get current hash
-    current_hash = auth.hash
-    print(f"Current hash: {current_hash}")
+    # Generate current token
+    current_token = auth.generate_token()
+    print(f"Current token: {current_token}")
 
-    # Get sequential hashes
-    sequential_hashes = auth.sequential_hashes
-    print(f"Sequential hashes: {sequential_hashes}")
+    # Derive tokens for adjacent periods (handles clock drift)
+    info = auth.get_token_info(current_token) or {}
+    period = info.get("period")
+    sequential_tokens = (
+        [auth.generate_token(custom_period=p) for p in (period - 1, period, period + 1)]
+        if period is not None
+        else []
+    )
+    print(f"Sequential tokens: {sequential_tokens}")
 
-    # Validate hash
-    try:
-        auth.check(current_hash)
-        print("✅ Hash validation successful")
-    except UnauthorizedRequestError as e:
-        print(f"❌ Hash validation failed: {e}")
+    # Validate token (supports both exception- and bool-based APIs)
+    check_fn = getattr(auth, "check", None)
+    if callable(check_fn):
+        try:
+            check_fn(current_token)
+            print("✅ Token validation successful")
+        except UnauthorizedRequestError as e:
+            print(f"❌ Token validation failed: {e}")
+    else:
+        if auth.validate_token(current_token):
+            print("✅ Token validation successful")
+        else:
+            print("❌ Token validation failed")
 
-    # Test invalid hash
-    try:
-        auth.check("invalid-hash")
-        print("❌ Should have failed")
-    except UnauthorizedRequestError:
-        print("✅ Invalid hash correctly rejected")
+    # Test invalid token
+    invalid_token = "invalid-token"
+    if callable(check_fn):
+        try:
+            check_fn(invalid_token)
+            print("❌ Should have failed")
+        except UnauthorizedRequestError:
+            print("✅ Invalid token correctly rejected")
+    else:
+        if not auth.validate_token(invalid_token):
+            print("✅ Invalid token correctly rejected")
+        else:
+            print("❌ Should have failed")
 
     print()
 
@@ -124,19 +144,23 @@ def demo_secure_urls():
     secure_url = composer.build_url(parameters)
     print(f"Secure URL: {secure_url}")
 
-    # Parse URL (simulate receiving the request)
-    # In a real scenario, you'd extract h and d from the URL
+    # Parse URL (simulate receiving the request) and extract h and d
     reader = SecureURLReader(
         passphrase="demo-secret-passphrase", period_size=5, num_sequential_hashes=3
     )
 
-    # Extract hash and encrypted data from URL
-    # This is a simplified example - in reality you'd parse the URL
+    # Extract token (h) and encrypted payload (d) from the URL
     try:
-        # For demo purposes, we'll encrypt again to get the values
-        encrypted_data, hash_value = composer.encrypt_parameters(parameters)
+        from urllib.parse import parse_qs, urlparse
 
-        # Decrypt parameters
+        parsed = urlparse(secure_url)
+        qs = parse_qs(parsed.query)
+        hash_value = qs.get("h", [None])[0]
+        encrypted_data = qs.get("d", [None])[0]
+        if not hash_value or not encrypted_data:
+            raise ValueError("Missing 'h' (token) or 'd' (encrypted data) in URL.")
+
+        # Decrypt parameters (will include 'unicode'; replay protection applies)
         decrypted_params = reader(encrypted_data, hash_value)
         print(f"Decrypted parameters: {decrypted_params}")
 

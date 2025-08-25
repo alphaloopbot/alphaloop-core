@@ -13,6 +13,8 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
+set NEED_CREATE=1
+
 REM Check if environment already exists
 conda env list | findstr "alphaloop-core" >nul
 if %errorlevel% equ 0 (
@@ -20,15 +22,21 @@ if %errorlevel% equ 0 (
     set /p choice="Do you want to remove it and recreate? (y/N): "
     if /i "%choice%"=="y" (
         echo 🗑️  Removing existing environment...
-        conda env remove -n alphaloop-core
+        conda env remove -y -n alphaloop-core
     ) else (
         echo ✅ Using existing environment
+        set NEED_CREATE=0
     )
 )
 
-REM Create environment from yml file
-echo 📦 Creating conda environment from environment.yml...
-conda env create -f environment.yml
+REM Create or update environment from yml file
+if "%NEED_CREATE%"=="1" (
+    echo 📦 Creating conda environment from environment.yml...
+    conda env create -f environment.yml
+) else (
+    echo ♻️  Updating existing environment from environment.yml...
+    conda env update -n alphaloop-core -f environment.yml --prune
+)
 
 REM Activate environment
 echo 🔧 Activating environment...

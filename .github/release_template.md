@@ -60,9 +60,9 @@ make type-check
 
 ## 🔗 Links
 
-- [GitHub Repository](https://github.com/alphaloop-core/alphaloop-core)
-- [Documentation](https://github.com/alphaloop-core/alphaloop-core/tree/main/docs)
-- [Issues](https://github.com/alphaloop-core/alphaloop-core/issues)
+- [GitHub Repository](https://github.com/alphaloopbot/alphaloop-core)
+- [Documentation](https://github.com/alphaloopbot/alphaloop-core/tree/main/docs)
+- [Issues](https://github.com/alphaloopbot/alphaloop-core/issues)
 
 ## 🤝 Contributing
 
