@@ -15,8 +15,8 @@ os.environ.setdefault("LOG_LEVEL", "DEBUG")
 os.environ.setdefault("API_KEY", "test-key")
 
 
-def pytest_ignore_collect(collection_path):
+def pytest_ignore_collect(collection_path: Path, config):
     """Ignore infrastructure test directories."""
-    p = str(collection_path)
-    # ignore any test dirs living under src/infrastructure/**/tests
-    return "src/infrastructure" in p and "/tests" in p
+    # Ignore any test dirs living under src/infrastructure/**/tests
+    parts = collection_path.parts
+    return "src" in parts and "infrastructure" in parts and "tests" in parts

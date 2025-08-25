@@ -15,6 +15,7 @@ DB_HOST="${DB_HOST:-localhost}"
 DB_PORT="${DB_PORT:-5432}"
 DB_USER="${DB_USER:-didac}"
 DB_PASSWORD="${DB_PASSWORD:-your_secure_password}"
+export PGPASSWORD="$DB_PASSWORD"
 
 echo "Starting database and service testing..."
 
@@ -80,8 +81,8 @@ fi
 # Test Market Data Service
 echo ""
 echo "Testing Market Data Service Storage"
-docker run --rm --network host \
-    -e DB_HOST=host.docker.internal \
+if docker run --rm --add-host=host.docker.internal:host-gateway \
+    -e DB_HOST="${DB_HOST}" \
     -e DB_PORT="$DB_PORT" \
     -e DB_USER="$DB_USER" \
     -e DB_PASSWORD="$DB_PASSWORD" \
@@ -110,9 +111,8 @@ try:
 except Exception as e:
     print(f'❌ Market data test error: {e}')
     sys.exit(1)
-"
-
-if [ $? -eq 0 ]; then
+";
+then
     echo "✅ Market data storage test passed"
 else
     echo "❌ Market data storage test failed"

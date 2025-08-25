@@ -44,10 +44,12 @@ async def example_using_official_packages():
     # 4. Use storage package
     print("\n💾 Using alphaloop-storage:")
     database_manager = await service_factory.get_database_manager()
-    _schema_manager = await service_factory.get_schema_manager()
-
+    try:
+        _schema_manager = await service_factory.get_schema_manager()  # may not exist yet
+        print("  ✅ Schema manager ready")
+    except AttributeError:
+        print("  ⚠️ Schema manager not available in this build")
     print(f"  ✅ Database config: {database_manager.config.host}:{database_manager.config.port}")
-    print("  ✅ Schema manager ready")
 
     # 5. Use heartbeat package
     print("\n💓 Using alphaloop-heartbeat:")
@@ -147,6 +149,13 @@ async def main():
         import traceback
 
         traceback.print_exc()
+    finally:
+        # Ensure all services are closed even if an earlier step failed
+        try:
+            await service_factory.close_all()
+            print("  ✅ All services closed (finalizer)")
+        except Exception:
+            pass
 
 
 if __name__ == "__main__":

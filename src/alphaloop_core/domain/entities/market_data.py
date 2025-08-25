@@ -1,6 +1,7 @@
 """Market data entity for price and volume information."""
 
 from datetime import datetime
+from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
@@ -18,8 +19,8 @@ class MarketData(Entity):
         self,
         metadata_id: int,
         timestamp_id: int,
-        price: float,
-        quote_volume24h: float,
+        price: Decimal | float | int | str,
+        quote_volume24h: Decimal | float | int | str,
         currency: Currency | None = None,
         entity_id: UUID | None = None,
         created_at: datetime | None = None,
@@ -29,7 +30,7 @@ class MarketData(Entity):
         super().__init__(entity_id, created_at, updated_at)
 
         self._metadata_id = int(metadata_id)
-        self._timestamp_id = timestamp_id
+        self._timestamp_id = int(timestamp_id)
         self._price = Price(price, currency or get_default_currency())
         self._quote_volume24h = Quantity(quote_volume24h)
 
@@ -56,10 +57,10 @@ class MarketData(Entity):
     def validate(self) -> bool:
         """Validate the market data."""
         return (
-            bool(self._metadata_id)
+            self._metadata_id > 0
             and self._timestamp_id > 0
             and self._price.value > 0
-            and self._quote_volume24h.value >= 0
+            and self._quote_volume24h.value > 0
         )
 
     def to_dict(self) -> dict[str, Any]:

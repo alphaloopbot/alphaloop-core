@@ -14,7 +14,7 @@ jobs:
         fetch-depth: 0
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: "3.12"
 
@@ -40,22 +40,20 @@ jobs:
     - name: Generate release notes
       id: release_notes
       run: |
-        TAG_NAME=${GITHUB_REF#refs/tags/}
-        VERSION=${TAG_NAME#v}
+        TAG_NAME="${GITHUB_REF#refs/tags/}"
+        VERSION="${TAG_NAME#v}"
 
-        # Generate release notes from template
         if [ -f ".github/release_template.md" ]; then
-          RELEASE_NOTES=$(cat .github/release_template.md)
-          # Replace placeholders
-          RELEASE_NOTES=$(echo "$RELEASE_NOTES" | sed "s/{{VERSION}}/$VERSION/g")
-          RELEASE_NOTES=$(echo "$RELEASE_NOTES" | sed "s/{{TAG_NAME}}/$TAG_NAME/g")
+          RELEASE_NOTES="$(sed "s/{{VERSION}}/${VERSION}/g; s/{{TAG_NAME}}/${TAG_NAME}/g" .github/release_template.md)"
         else
-          RELEASE_NOTES="Release $TAG_NAME"
+          RELEASE_NOTES="Release ${TAG_NAME}"
         fi
 
-        echo "release_notes<<EOF" >> $GITHUB_OUTPUT
-        echo "$RELEASE_NOTES" >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
+        {
+          echo "release_notes<<EOF"
+          echo "${RELEASE_NOTES}"
+          echo "EOF"
+        } >> "$GITHUB_OUTPUT"
 
     - name: Create Release
       uses: actions/create-release@v1

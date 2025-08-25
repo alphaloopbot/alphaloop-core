@@ -82,20 +82,20 @@ CREATE TABLE system_metrics_summary (
 
 -- Insert sample system metadata
 INSERT INTO system_attributes (
-    host_name, system_name, node_name, machine, kernel_version,
-    cpu_cores, cpu_cores_logical, ram_total, disk_total, boot_time
-) VALUES (
-    'alphaloop-node-001',
-    'Linux',
-    'alphaloop-node-001',
-    'x86_64',
-    '5.15.0-generic',
-    8,
-    16,
-    34359738368.0,  -- 32GB
-    1099511627776.0, -- 1TB
-    CURRENT_TIMESTAMP - INTERVAL '1 hour'
-);
+	    host_name, system_name, node_name, machine, kernel_version,
+	    cpu_cores, cpu_cores_logical, ram_total, ssd_total, boot_time
+	) VALUES (
+	    'alphaloop-node-001',
+	    'Linux',
+	    'alphaloop-node-001',
+	    'x86_64',
+	    '5.15.0-generic',
+	    8,
+	    16,
+	    34359738368.0,  -- 32GB
+	    1099511627776.0, -- 1TB
+	    CURRENT_TIMESTAMP - INTERVAL '1 hour'
+	);
 
 -- ============================================================================
 -- ALPHALOOP_MARKET DATABASE

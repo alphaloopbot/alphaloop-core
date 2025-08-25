@@ -3,7 +3,13 @@
 # AlphaLoop Services E2E Test Script
 # Tests both system metrics and market data services end-to-end
 
-set -e
+set -Eeuo pipefail
+
+# Ensure background containers are cleaned up on exit/interrupt
+cleanup() {
+    docker rm -f test-system-metrics test-market-data >/dev/null 2>&1 || true
+}
+trap cleanup EXIT INT TERM
 
 # Colors for output
 RED='\033[0;31m'
@@ -252,8 +258,8 @@ else:
     # Test that both services can run simultaneously
     echo -e "\n${YELLOW}Testing concurrent service execution...${NC}"
 
-    # Start both services in background and check they don't crash immediately
-    docker run --rm --name test-system-metrics "$SYSTEM_METRICS_IMAGE" python -c "
+    # Start both services in background with a timeout and check they don't crash
+    timeout "${TEST_TIMEOUT}s" docker run --rm --name test-system-metrics "$SYSTEM_METRICS_IMAGE" python -c "
 import time
 from alphaloop_core.services.system_metrics import SystemMetricsService
 service = SystemMetricsService()
@@ -261,8 +267,9 @@ print('✅ System Metrics Service started successfully')
 time.sleep(2)
 print('✅ System Metrics Service completed successfully')
 " &
+    pid1=$!
 
-    docker run --rm --name test-market-data "$MARKET_DATA_IMAGE" python -c "
+    timeout "${TEST_TIMEOUT}s" docker run --rm --name test-market-data "$MARKET_DATA_IMAGE" python -c "
 import time
 from alphaloop_core.services.market_data import MarketDataService
 service = MarketDataService()
@@ -270,13 +277,19 @@ print('✅ Market Data Service started successfully')
 time.sleep(2)
 print('✅ Market Data Service completed successfully')
 " &
+    pid2=$!
 
-    # Wait for both services to complete
-    wait
+    # Wait for both and capture exit codes
+    wait "$pid1"; rc1=$?
+    wait "$pid2"; rc2=$?
 
-    print_result "Service Integration" 0 "Both services can run concurrently"
     ((total_tests++))
-    ((passed_tests++))
+    if [ $rc1 -eq 0 ] && [ $rc2 -eq 0 ]; then
+        print_result "Service Integration" 0 "Both services can run concurrently"
+        ((passed_tests++))
+    else
+        print_result "Service Integration" 1 "One or both services exited with errors (rc1=$rc1, rc2=$rc2)"
+    fi
 
     # Final Results
     echo -e "\n${BLUE}📋 Test Results Summary${NC}"

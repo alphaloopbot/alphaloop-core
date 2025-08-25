@@ -27,10 +27,9 @@ WORKDIR /app
 # Set Python path to include src directory and infrastructure modules
 ENV PYTHONPATH=/app/src:/app/src/infrastructure
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
-    g++ \
+# No build tools needed at runtime; keep the image slim
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy Python packages from builder stage

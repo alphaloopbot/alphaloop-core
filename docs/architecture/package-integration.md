@@ -60,30 +60,47 @@ def get_storage_config() -> DatabaseConfig:
 ### 2. **Service Factory Pattern**
 
 ```python
-# src/alphaloop_core/shared/utils/service_factory.py
-class ServiceFactory:
-    """Factory for creating services using official AlphaLoop infrastructure packages."""
+from typing import Optional
+	from alphaloop_cache import CacheManager
+	from alphaloop_logging import AlphaLoopLogger
+	from alphaloop_heartbeat import HeartbeatGenerator
+	from .package_config import (
+	    get_cache_config,
+	    get_logging_config,
+	    get_heartbeat_config,
+	)
 
-    async def get_cache_manager(self) -> CacheManager:
-        """Get or create cache manager."""
-        if self._cache_manager is None:
-            config = get_cache_config()
-            self._cache_manager = CacheManager(config)
-        return self._cache_manager
+	class ServiceFactory:
+	    """Factory for creating services using official AlphaLoop infrastructure packages."""
 
-    async def get_logger(self) -> AlphaLoopLogger:
-        """Get or create logger."""
-        if self._logger is None:
-            config = get_logging_config()
-            self._logger = AlphaLoopLogger(config)
-        return self._logger
+	    def __init__(self) -> None:
+	        self._cache_manager: Optional[CacheManager] = None
+	        self._logger: Optional[AlphaLoopLogger] = None
+	        self._heartbeat_generator: Optional[HeartbeatGenerator] = None
 
-    async def get_heartbeat_generator(self, service_name: str = "alphaloop-core") -> HeartbeatGenerator:
-        """Get or create heartbeat generator."""
-        if self._heartbeat_generator is None:
-            config = get_heartbeat_config()
-            self._heartbeat_generator = HeartbeatGenerator(service_name, config)
-        return self._heartbeat_generator
+	    async def get_cache_manager(self) -> CacheManager:
+	        """Get or create cache manager."""
+	        if self._cache_manager is None:
+	            config = get_cache_config()
+	            self._cache_manager = CacheManager(config)
+	        return self._cache_manager
+
+	    async def get_logger(self) -> AlphaLoopLogger:
+	        """Get or create logger."""
+	        if self._logger is None:
+	            config = get_logging_config()
+	            self._logger = AlphaLoopLogger(config)
+	        return self._logger
+
+	    async def get_heartbeat_generator(self, service_name: str = "alphaloop-core") -> HeartbeatGenerator:
+	        """Get or create heartbeat generator."""
+	        if self._heartbeat_generator is None:
+	            config = get_heartbeat_config()
+	            self._heartbeat_generator = HeartbeatGenerator(service_name, config)
+	        return self._heartbeat_generator
+
+	# Export a shared instance for convenience
+	service_factory = ServiceFactory()
 ```
 
 ### 3. **Unified Exports**

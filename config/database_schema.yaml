@@ -217,6 +217,12 @@ databases:
             type: "String"
           - name: "active"
             type: "Boolean"
+        indexes:
+          - name: "uq_tickers_exchange"
+            unique: true
+            columns: ["ticker", "exchange"]
+          - name: "idx_tickers_metadata_id"
+            columns: ["metadata_id"]
         policies:
           oncloud: {}
           local:

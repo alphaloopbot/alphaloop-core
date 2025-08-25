@@ -2,7 +2,7 @@
 
 # AlphaLoop Services - End-to-End Testing Script
 
-set -e
+set -Eeuo pipefail
 
 echo "🧪 AlphaLoop Services - End-to-End Testing"
 echo "=========================================="

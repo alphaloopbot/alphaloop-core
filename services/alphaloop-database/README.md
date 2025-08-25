@@ -33,17 +33,19 @@ PostgreSQL database service for AlphaLoop Core with separate databases for syste
 
 ## Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `POSTGRES_USER` | PostgreSQL superuser | `postgres` |
-| `POSTGRES_PASSWORD` | PostgreSQL superuser password | - |
-| `DB_SYS_USER` | System database user | `alphaloop_sys` |
-| `DB_SYS_PASSWORD` | System database password | - |
-| `DB_MARKET_NAME` | Market database name | `alphaloop_market` |
-| `DB_SYS_NAME` | System database name | `alphaloop_sys` |
-| `DB_TEST_USER` | Test user | `alphaloop_test` |
-| `DB_TEST_PASSWORD` | Test user password | - |
-| `ALPHALOOP_HOME` | Base directory for data | `/opt/alphaloop` |
+| Variable             | Description                         | Default             |
+|----------------------|-------------------------------------|---------------------|
+| `POSTGRES_USER`      | PostgreSQL superuser                | `postgres`          |
+| `POSTGRES_PASSWORD`  | PostgreSQL superuser password       | -                   |
+| `DB_SYS_USER`        | System database user                | `alphaloop_sys`     |
+| `DB_SYS_PASSWORD`    | System database password            | -                   |
+| `DB_MARKET_USER`     | Market database user                | `alphaloop_market`  |
+| `DB_MARKET_PASSWORD` | Market database password            | -                   |
+| `DB_MARKET_NAME`     | Market database name                | `alphaloop_market`  |
+| `DB_SYS_NAME`        | System database name                | `alphaloop_sys`     |
+| `DB_TEST_USER`       | Test user                           | `alphaloop_test`    |
+| `DB_TEST_PASSWORD`   | Test user password                  | -                   |
+| `ALPHALOOP_HOME`     | Base directory for data             | `/opt/alphaloop`    |
 
 ## Database Structure
 
@@ -69,7 +71,8 @@ psql -h localhost -p 5432 -U postgres -d postgres
 psql -h localhost -p 5432 -U alphaloop_sys -d alphaloop_sys
 
 # Connect to market database
-psql -h localhost -p 5432 -U alphaloop_sys -d alphaloop_market
+psql -h localhost -p 5432 -U alphaloop_market -d alphaloop_market
+
 ```
 
 ## Health Check

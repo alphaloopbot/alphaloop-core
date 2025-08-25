@@ -71,5 +71,5 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 ---
 
 **Version**: {{VERSION}}
-**Release Date**: $(date +%Y-%m-%d)
+**Release Date**: {{RELEASE_DATE}}
 **Python Version**: 3.12+

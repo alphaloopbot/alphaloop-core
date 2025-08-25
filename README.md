@@ -162,12 +162,11 @@ alphaloop-core/
 │       ├── exceptions/          # Exception hierarchy
 │       └── types/               # Custom types & enums
 ├── infrastructure/              # Infrastructure packages
-│   ├── alphaloop-heartbeat/     # Health monitoring
-│   ├── alphaloop-security/      # Encryption & authentication
-│   ├── alphaloop-logging/       # Advanced logging with Telegram
-│   ├── alphaloop-storage/       # Unified data storage & management
-│   └── alphaloop-cache/         # Redis/Valkey caching & pub/sub
-├── docker/                       # Docker configurations
+│   ├── alphaloop_heartbeat/     # Health monitoring
+│   ├── alphaloop_security/      # Encryption & authentication
+│   ├── alphaloop_logging/       # Advanced logging with Telegram
+│   ├── alphaloop_storage/       # Unified data storage & management
+│   └── alphaloop_cache/         # Redis/Valkey caching & pub/sub
 ├── tests/                        # Test suites
 ├── docs/                         # Documentation
 └── scripts/                      # Build & deployment scripts
