@@ -64,7 +64,9 @@ class PriceCache:
     async def cache_price(self, price_data: PriceData, ttl: int | None = None) -> bool:
         """Cache price data."""
         try:
-            key = self.key_builder.build_price_key(price_data.symbol, price_data.exchange)
+            key = self.key_builder.build_price_key(
+                price_data.symbol, price_data.exchange
+            )
             value = price_data.to_dict()
 
             # Add cache metadata
@@ -81,10 +83,17 @@ class PriceCache:
 
             if success:
                 await self._update_price_index(price_data.symbol, price_data.exchange)
+                # Also write a history entry with a time-suffixed key for retrieval by pattern
+                history_key = f"{key}:{int(cache_entry.timestamp.timestamp())}"
+                await self.cache_manager.set_key(
+                    history_key, cache_entry.to_dict(), ttl or self.default_ttl
+                )
 
             return success
         except Exception as e:
-            raise PriceCacheError(f"Failed to cache price for {price_data.symbol}: {e}") from e
+            raise PriceCacheError(
+                f"Failed to cache price for {price_data.symbol}: {e}"
+            ) from e
 
     async def get_price(self, symbol: str, exchange: str) -> PriceData | None:
         """Get cached price data."""
@@ -108,7 +117,9 @@ class PriceCache:
         except Exception as e:
             raise PriceCacheError(f"Failed to get price for {symbol}: {e}") from e
 
-    async def get_latest_prices(self, symbols: list[str], exchange: str) -> dict[str, PriceData]:
+    async def get_latest_prices(
+        self, symbols: list[str], exchange: str
+    ) -> dict[str, PriceData]:
         """Get latest prices for multiple symbols."""
         try:
             result = {}
@@ -144,7 +155,9 @@ class PriceCache:
             history.sort(key=lambda x: x.timestamp)
             return history
         except Exception as e:
-            raise PriceCacheError(f"Failed to get price history for {symbol}: {e}") from e
+            raise PriceCacheError(
+                f"Failed to get price history for {symbol}: {e}"
+            ) from e
 
     async def invalidate_price(self, symbol: str, exchange: str) -> bool:
         """Invalidate cached price."""
@@ -152,7 +165,9 @@ class PriceCache:
             key = self.key_builder.build_price_key(symbol, exchange)
             return await self.cache_manager.delete_key(key)
         except Exception as e:
-            raise PriceCacheError(f"Failed to invalidate price for {symbol}: {e}") from e
+            raise PriceCacheError(
+                f"Failed to invalidate price for {symbol}: {e}"
+            ) from e
 
     async def invalidate_exchange_prices(self, exchange: str) -> int:
         """Invalidate all prices for an exchange."""

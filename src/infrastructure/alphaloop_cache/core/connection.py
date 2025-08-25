@@ -187,11 +187,20 @@ class CacheManager:
             raise CacheOperationError(f"Failed to get memory usage: {e}") from e
 
     async def get_keys_count(self, pattern: str = "*") -> int:
-        """Get count of keys matching pattern."""
+        """Get count of keys matching pattern (uses SCAN to avoid blocking)."""
         try:
-            return await self.redis_client.dbsize()
+            if pattern == "*":
+                return await self.redis_client.dbsize()
+            count = 0
+            cursor = 0
+            while True:
+                cursor, keys = await self.redis_client.scan(cursor=cursor, match=pattern, count=1000)
+                count += len(keys)
+                if cursor == 0:
+                    break
+            return count
         except Exception as e:
-            raise CacheOperationError(f"Failed to get keys count: {e}") from e
+            raise CacheOperationError(f"Failed to get keys count (pattern={pattern}): {e}") from e
 
     async def flush_db(self) -> bool:
         """Flush current database."""

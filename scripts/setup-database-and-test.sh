@@ -87,8 +87,12 @@ try:
         '-- AlphaLoop Database Schemas - Generated on-the-fly from YAML',
         '-- Source: config/database_schema.yaml',
         '',
-        '-- Drop existing databases if they exist',
+        '-- Drop existing databases if they exist (with connection termination)',
+        '-- Terminate active connections to alphaloop_sys',
+        "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='alphaloop_sys' AND pid <> pg_backend_pid();",
         'DROP DATABASE IF EXISTS alphaloop_sys;',
+        '-- Terminate active connections to alphaloop_market',
+        "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname='alphaloop_market' AND pid <> pg_backend_pid();",
         'DROP DATABASE IF EXISTS alphaloop_market;',
         '',
         '-- Create fresh databases',
@@ -175,6 +179,13 @@ echo ""
 
 # Setup databases and tables
 echo -e "${BLUE}Setting up databases and tables...${NC}"
+
+# Safety: require explicit opt-in for destructive drop/create
+if [[ "${ALLOW_DROP_DB:-}" != "1" ]]; then
+    echo -e "${RED}❌ Refusing to drop/create databases without ALLOW_DROP_DB=1${NC}"
+    echo -e "${YELLOW}Set ALLOW_DROP_DB=1 to allow destructive database operations${NC}"
+    exit 1
+fi
 PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d postgres <<< "$(generate_sql_from_yaml)"
 
 if [ $? -eq 0 ]; then
