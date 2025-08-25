@@ -25,10 +25,18 @@ from typing import Any
 
 from sqlalchemy import create_engine, text
 from sqlalchemy.engine import Engine
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 from sqlalchemy.orm import sessionmaker
 
-from infrastructure.alphaloop_storage.exceptions import DatabaseConnectionError, DatabaseQueryError
+from infrastructure.alphaloop_storage.exceptions import (
+    DatabaseConnectionError,
+    DatabaseQueryError,
+)
 
 
 @dataclass
@@ -129,7 +137,7 @@ class DatabaseManager:
         self._sync_engine: Engine | None = None
         self._async_engine: AsyncEngine | None = None
         self._sync_session_factory: sessionmaker | None = None
-        self._async_session_factory: sessionmaker | None = None
+        self._async_session_factory: async_sessionmaker[AsyncSession] | None = None
 
     @property
     def sync_engine(self) -> Engine:
@@ -171,14 +179,14 @@ class DatabaseManager:
         return self._sync_session_factory
 
     @property
-    def async_session_factory(self) -> sessionmaker:
+    def async_session_factory(self) -> async_sessionmaker[AsyncSession]:
         """Get asynchronous session factory."""
         if self._async_session_factory is None:
-            self._async_session_factory = sessionmaker(
+            self._async_session_factory = async_sessionmaker(
                 bind=self.async_engine,
                 class_=AsyncSession,
-                autocommit=False,
                 autoflush=False,
+                expire_on_commit=False,
             )
         return self._async_session_factory
 
