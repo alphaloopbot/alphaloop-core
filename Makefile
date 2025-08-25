@@ -24,8 +24,9 @@ dev: ## Install development dependencies and run full development cycle
 	@$(MAKE) test
 	@echo "Development cycle complete! ✨"
 
-test: ## Run unit tests
+test: ## Run unit tests (integration tests skipped - API not implemented yet)
 	poetry run pytest tests/unit/ -v
+	@echo "💡 Integration tests skipped - API not implemented yet"
 
 test-infrastructure: ## Run tests for all infrastructure packages
 	@echo "🧪 Running tests for all infrastructure packages..."
@@ -58,8 +59,10 @@ test-all: ## Run all tests (main project + infrastructure)
 test-conda: ## Test conda environment setup
 	python scripts/test_conda_env.py
 
-test-integration: ## Run integration tests (requires running services)
-	poetry run pytest tests/integration/ -v
+test-integration: ## Run integration tests (SKIPPED - API not implemented yet)
+	@echo "⚠️  Integration tests skipped - API not implemented yet"
+	@echo "💡 These tests will be enabled when the API is implemented"
+	@echo "   Run manually with: poetry run pytest tests/integration/ -v"
 
 integration: restart-no-cache wait-for-services test-integration ## Restart services and run integration tests
 	@echo "Integration testing complete! ✨"

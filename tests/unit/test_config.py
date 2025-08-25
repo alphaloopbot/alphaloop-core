@@ -12,6 +12,9 @@ class TestConfig:
 
     def test_settings_defaults(self) -> None:
         """Test that settings returns expected defaults."""
+        # Clear the settings cache to ensure fresh defaults
+        settings.cache_clear()
+
         with patch.dict(os.environ, {}, clear=True):
             config = settings()
 
