@@ -6,23 +6,23 @@ This directory contains **internal infrastructure modules** that provide essenti
 
 | Module | Purpose | Key Features |
 |---------|---------|--------------|
-| **alphaloop-heartbeat** | Health monitoring | Service health checks, heartbeat generation, process monitoring |
-| **alphaloop-logging** | Centralized logging | Multi-handler logging, Telegram integration, structured output |
-| **alphaloop-security** | Security & encryption | Time-based authentication, data encryption, secure URLs |
-| **alphaloop-storage** | Database management | Connection pooling, schema management, table operations |
-| **alphaloop-cache** | Caching & messaging | Redis/Valkey integration, price caching, pub/sub |
+| **alphaloop_heartbeat** | Health monitoring | Service health checks, heartbeat generation, process monitoring |
+| **alphaloop_logging** | Centralized logging | Multi-handler logging, Telegram integration, structured output |
+| **alphaloop_security** | Security & encryption | Time-based authentication, data encryption, secure URLs |
+| **alphaloop_storage** | Database management | Connection pooling, schema management, table operations |
+| **alphaloop_cache** | Caching & messaging | Redis/Valkey integration, price caching, pub/sub |
 
 ## 🏗️ Architecture
 
 ```mermaid
 graph TD
-    A[alphaloop-core] --> B[alphaloop-heartbeat]
-    A --> C[alphaloop-logging]
-    A --> D[alphaloop-security]
-    A --> E[alphaloop-storage]
-    A --> F[alphaloop-cache]
+    A[alphaloop-core] --> B[alphaloop_heartbeat]
+    A --> C[alphaloop_logging]
+    A --> D[alphaloop_security]
+    A --> E[alphaloop_storage]
+    A --> F[alphaloop_cache]
 
-    E --> F[alphaloop-cache]
+    E --> F[alphaloop_cache]
 
     style A fill:#e1f5fe
     style B fill:#f3e5f5
@@ -34,7 +34,7 @@ graph TD
 
 ### **Module Dependencies**
 - **alphaloop-core** imports all infrastructure modules
-- **alphaloop-storage** may use **alphaloop-cache** for caching
+- **alphaloop_storage** may use **alphaloop_cache** for caching
 - **No circular dependencies** between modules
 - **Internal modules** - not meant to be used outside alphaloop-core
 
@@ -73,29 +73,29 @@ class SystemMetricsService:
 Each module uses environment variables for configuration:
 
 ```bash
-# alphaloop-heartbeat
+# alphaloop_heartbeat
 HEARTBEAT_INTERVAL=30
 HEARTBEAT_TIMEOUT=120
 HEARTBEAT_DIRECTORY=/var/heartbeats
 
-# alphaloop-logging
+# alphaloop_logging
 LOG_LEVEL=INFO
 LOG_FORMAT=json
 TELEGRAM_BOT_TOKEN=your_token
 TELEGRAM_CHAT_ID=your_chat_id
 
-# alphaloop-security
+# alphaloop_security
 SECURITY_SECRET_KEY=your_secret_key
 SECURITY_TIME_WINDOW=300
 
-# alphaloop-storage
+# alphaloop_storage
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=alphaloop
 DB_USER=postgres
 DB_PASSWORD=password
 
-# alphaloop-cache
+# alphaloop_cache
 CACHE_HOST=localhost
 CACHE_PORT=6379
 CACHE_DB=0
