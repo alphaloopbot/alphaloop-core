@@ -54,7 +54,7 @@ def get_logging_config() -> LoggingConfig:
 @lru_cache
 def get_storage_config() -> DatabaseConfig:
     """Get storage configuration using alphaloop-storage."""
-    return DatabaseConfig.from_env(prefix="DATABASE_")
+    return DatabaseConfig.from_env(prefix="DB_")
 ```
 
 ### 2. **Service Factory Pattern**
@@ -125,7 +125,7 @@ heartbeat_generator = await service_factory.get_heartbeat_generator("my-service"
 
 # Use services
 logger.info("Application started")
-cache_manager.set_key("test", "value")
+cache_manager.set("test", "value")
 await heartbeat_generator.generate_heartbeat()
 ```
 
@@ -139,7 +139,7 @@ from alphaloop_storage import DatabaseConfig, DatabaseManager
 # Create configurations
 cache_config = CacheConfig.from_env(prefix="CACHE_")
 logging_config = LoggingConfig.from_env(app_name="alphaloop-core")
-storage_config = DatabaseConfig.from_env(prefix="DATABASE_")
+storage_config = DatabaseConfig.from_env(prefix="DB_")
 
 # Create managers
 cache_manager = CacheManager(cache_config)
@@ -179,7 +179,7 @@ print(f"Storage config: {configs['storage']}")
 ### **4. alphaloop-storage**
 - **Purpose**: Database management and schema handling
 - **Integration**: Data persistence, table operations, schema management
-- **Configuration**: `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_NAME`
+- **Configuration**: `DB_HOST`, `DB_PORT`, `DB_NAME`
 
 ### **5. alphaloop-heartbeat**
 - **Purpose**: Health monitoring and service status

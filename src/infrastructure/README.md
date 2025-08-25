@@ -111,7 +111,7 @@ CACHE_PASSWORD=
 make test-infrastructure
 
 # Test specific module
-cd src/infrastructure/alphaloop-logging
+cd src/infrastructure/alphaloop_logging
 python -m pytest tests/
 ```
 
@@ -127,11 +127,11 @@ make services-test-e2e
 
 ## 📚 Module Documentation
 
-- [alphaloop-heartbeat](./alphaloop-heartbeat/README.md) - Health monitoring
-- [alphaloop-logging](./alphaloop-logging/README.md) - Logging system
-- [alphaloop-security](./alphaloop-security/README.md) - Security utilities
-- [alphaloop-storage](./alphaloop-storage/README.md) - Database management
-- [alphaloop-cache](./alphaloop-cache/README.md) - Caching system
+- [alphaloop-heartbeat](./alphaloop_heartbeat/README.md) - Health monitoring
+- [alphaloop-logging](./alphaloop_logging/README.md) - Logging system
+- [alphaloop-security](./alphaloop_security/README.md) - Security utilities
+- [alphaloop-storage](./alphaloop_storage/README.md) - Database management
+- [alphaloop-cache](./alphaloop_cache/README.md) - Caching system
 
 ## 🎯 Key Points
 
