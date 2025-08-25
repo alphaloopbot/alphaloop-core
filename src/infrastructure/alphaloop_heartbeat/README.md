@@ -68,14 +68,18 @@ class SystemMetricsService:
 ### **Health Checking**
 
 ```python
+import asyncio
 from alphaloop_heartbeat import HeartbeatChecker
 
-# Check if service is healthy
-checker = HeartbeatChecker("system-metrics")
-if checker.is_healthy():
-    print("Service is running normally")
-else:
-    print("Service may be down or stale")
+async def main():
+    checker = HeartbeatChecker()
+    status = await checker.check_service_health("system-metrics")
+    if status["healthy"]:
+        print("Service is running normally")
+    else:
+        print(f"Service may be down or stale: {status['error']}")
+
+asyncio.run(main())
 ```
 
 ## ⚙️ Configuration
@@ -122,9 +126,8 @@ make test-core
 ### **HeartbeatChecker**
 
 **Methods:**
-- `is_healthy()`: Check if service is healthy
-- `is_stale()`: Check if heartbeat is stale
-- `get_last_heartbeat()`: Get last heartbeat timestamp
+- `check_service_health(service_name, timeout_seconds=None)`: Check health status of a specific service
+- `check_all_services(service_names)`: Check health status of multiple services
 
 ### **HeartbeatSettings**
 

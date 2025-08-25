@@ -109,7 +109,7 @@ TELEGRAM_LOG_LEVEL=ERROR
 
 ```bash
 # Test this module
-cd src/infrastructure/alphaloop-logging
+cd src/infrastructure/alphaloop_logging
 python -m pytest tests/
 
 # Test integration with alphaloop-core
