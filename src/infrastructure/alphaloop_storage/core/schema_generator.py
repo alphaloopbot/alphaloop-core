@@ -42,10 +42,10 @@ class SchemaGenerator:
         try:
             with open(self.yaml_path) as file:
                 return yaml.safe_load(file)
-        except FileNotFoundError:
-            raise FileNotFoundError(f"Schema file not found: {self.yaml_path}")
+        except FileNotFoundError as e:
+            raise FileNotFoundError(f"Schema file not found: {self.yaml_path}") from e
         except yaml.YAMLError as e:
-            raise yaml.YAMLError(f"Invalid YAML in schema file: {e}")
+            raise yaml.YAMLError(f"Invalid YAML in schema file: {e}") from e
 
     def _generate_column_sql(self, column: dict[str, Any]) -> str:
         """Generate SQL column definition from YAML column spec.

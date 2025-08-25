@@ -8,7 +8,7 @@ __author__ = "Didac Cristobal-Canals"
 __email__ = "didac.crst@gmail.com"
 
 from .core.connection import CacheConfig, CacheManager, create_cache_manager
-from .core.price_cache import PriceCache, PriceData
+from .core.generic_cache import GenericCache
 from .core.pubsub import PubSubManager, PubSubMessage
 from .models.cache_entry import CacheEntry
 from .utils.key_builder import KeyBuilder
@@ -17,8 +17,7 @@ __all__ = [
     "CacheConfig",
     "CacheManager",
     "create_cache_manager",
-    "PriceCache",
-    "PriceData",
+    "GenericCache",
     "PubSubManager",
     "PubSubMessage",
     "CacheEntry",

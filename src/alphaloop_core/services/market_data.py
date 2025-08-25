@@ -11,10 +11,12 @@ import random
 import time
 from typing import Any
 
-from alphaloop_cache import create_cache_manager
-from alphaloop_heartbeat import HeartbeatGenerator
-from alphaloop_logging import AlphaLoopLogger, LoggingConfig
-from alphaloop_storage import TableHandler, create_database_manager
+from infrastructure.alphaloop_cache import create_cache_manager
+from infrastructure.alphaloop_heartbeat import HeartbeatGenerator
+from infrastructure.alphaloop_logging import AlphaLoopLogger, LoggingConfig
+from infrastructure.alphaloop_storage import TableHandler, create_database_manager
+
+from .cache import PriceCacheService
 
 
 class MarketDataService:
@@ -39,6 +41,7 @@ class MarketDataService:
         self.metadata_handler = TableHandler("tickers_metadata", self.db_manager)
         self.data_handler = TableHandler("tickers_prices", self.db_manager)
         self.cache_manager = create_cache_manager()
+        self.price_cache = PriceCacheService(self.cache_manager)
         self.heartbeat_generator = HeartbeatGenerator("market-data")
 
         # Configuration
@@ -184,9 +187,9 @@ class MarketDataService:
             inserted_ids = await self.data_handler.insert_data(market_data)
 
             if inserted_ids is not None:
-                            self.logger.info_sync(
-                f"Stored {len(market_data)} market data records using infrastructure"
-            )
+                self.logger.info_sync(
+                    f"Stored {len(market_data)} market data records using infrastructure"
+                )
 
                 # Cache latest prices for quick access
                 for data in market_data:
@@ -262,7 +265,9 @@ class MarketDataService:
 
     def run_forever(self) -> None:
         """Main loop to collect and store market data continuously."""
-        self.logger.info_sync(f"Starting Market Data Service (interval: {self.market_data_interval}s)")
+        self.logger.info_sync(
+            f"Starting Market Data Service (interval: {self.market_data_interval}s)"
+        )
 
         last_sync_time = time.time()
 

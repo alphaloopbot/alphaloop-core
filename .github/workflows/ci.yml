@@ -76,15 +76,21 @@ jobs:
 
     - name: Activate conda environment and install project
       run: |
+        conda init bash
+        source ~/.bashrc
         conda activate alphaloop-core
         poetry install --no-interaction --no-root
 
     - name: Test conda environment
       run: |
+        conda init bash
+        source ~/.bashrc
         conda activate alphaloop-core
         python scripts/test_conda_env.py
 
     - name: Run tests in conda environment
       run: |
+        conda init bash
+        source ~/.bashrc
         conda activate alphaloop-core
         poetry run pytest tests/unit/ -v

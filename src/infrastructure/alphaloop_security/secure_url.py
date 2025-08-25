@@ -91,7 +91,7 @@ class SecureURLComposer:
             encrypted_data, hash_value = self.data_encryptor.encrypt(json.dumps(data))
             return encrypted_data, hash_value
         except Exception as e:
-            raise EncryptionError(f"Parameter encryption failed: {str(e)}")
+            raise EncryptionError(f"Parameter encryption failed: {str(e)}") from e
 
     def build_url(self, parameters: dict[str, Any]) -> str:
         """
@@ -169,9 +169,9 @@ class SecureURLReader:
             json_data = self.data_encryptor.decrypt(encrypted_data, hash_value)
             return json.loads(json_data)
         except json.JSONDecodeError as e:
-            raise EncryptionError(f"Failed to parse decrypted JSON: {str(e)}")
+            raise EncryptionError(f"Failed to parse decrypted JSON: {str(e)}") from e
         except Exception as e:
-            raise EncryptionError(f"Parameter decryption failed: {str(e)}")
+            raise EncryptionError(f"Parameter decryption failed: {str(e)}") from e
 
     def check_valid_unicode(self, unicode_value: str) -> None:
         """

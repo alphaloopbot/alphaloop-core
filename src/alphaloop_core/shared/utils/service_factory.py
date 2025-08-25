@@ -1,10 +1,14 @@
 """Service factory for AlphaLoop Core using official infrastructure packages."""
 
-from alphaloop_cache import CacheManager, PriceCache, PubSubManager
-from alphaloop_heartbeat import HeartbeatChecker, HeartbeatGenerator
-from alphaloop_logging import AlphaLoopLogger
-from alphaloop_security import ConnectionAuthenticator, DataEncryptor, SecureURLComposer
-from alphaloop_storage import DatabaseManager, TableHandler
+from infrastructure.alphaloop_cache import CacheManager, PubSubManager
+from infrastructure.alphaloop_heartbeat import HeartbeatChecker, HeartbeatGenerator
+from infrastructure.alphaloop_logging import AlphaLoopLogger
+from infrastructure.alphaloop_security import (
+    ConnectionAuthenticator,
+    DataEncryptor,
+    SecureURLComposer,
+)
+from infrastructure.alphaloop_storage import DatabaseManager, TableHandler
 
 from .package_config import (
     get_cache_config,
@@ -63,10 +67,12 @@ class ServiceFactory:
             self._heartbeat_checker = HeartbeatChecker(config)
         return self._heartbeat_checker
 
-    async def get_price_cache(self) -> PriceCache:
-        """Get or create price cache."""
+    async def get_price_cache(self):
+        """Get or create price cache service."""
+        from alphaloop_core.services.cache import PriceCacheService
+
         cache_manager = await self.get_cache_manager()
-        return PriceCache(cache_manager)
+        return PriceCacheService(cache_manager)
 
     async def get_pubsub_manager(self) -> PubSubManager:
         """Get or create pub/sub manager."""

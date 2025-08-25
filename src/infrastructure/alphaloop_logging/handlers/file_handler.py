@@ -75,7 +75,7 @@ class FileHandler(BaseHandler):
                     )
 
             except Exception as e:
-                raise HandlerError(f"Failed to write to log file: {str(e)}")
+                raise HandlerError(f"Failed to write to log file: {str(e)}") from e
 
     def _write_to_file(self, message: str) -> None:
         """Write message to file (synchronous)."""
@@ -91,7 +91,7 @@ class FileHandler(BaseHandler):
                     None, self._open_file_sync
                 )
             except Exception as e:
-                raise HandlerError(f"Failed to open log file {self._current_file}: {str(e)}")
+                raise HandlerError(f"Failed to open log file {self._current_file}: {str(e)}") from e
 
     def _open_file_sync(self) -> TextIO | None:
         """Open file synchronously."""

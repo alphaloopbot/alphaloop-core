@@ -168,7 +168,7 @@ class DataEncryptor:
 
             return no_pad_url_safe_encrypted_data, self._encryption_hash
         except Exception as e:
-            raise EncryptionError(f"Encryption failed: {str(e)}")
+            raise EncryptionError(f"Encryption failed: {str(e)}") from e
 
     def _add_padding(self, encrypted_data: str) -> str:
         """
@@ -206,9 +206,9 @@ class DataEncryptor:
             decrypted_data = Fernet(fernet_key).decrypt(base64_encrypted_data)
             return decrypted_data.decode()
         except (binascii.Error, UnicodeDecodeError) as e:
-            raise EncryptionError(f"Decryption failed: {str(e)}")
+            raise EncryptionError(f"Decryption failed: {str(e)}") from e
         except Exception as e:
-            raise EncryptionError(f"Decryption failed: {str(e)}")
+            raise EncryptionError(f"Decryption failed: {str(e)}") from e
 
     def is_valid_base64(self, data: str) -> bool:
         """

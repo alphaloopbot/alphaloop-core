@@ -3,10 +3,10 @@
 from functools import lru_cache
 from typing import Any
 
-from alphaloop_cache import CacheConfig
-from alphaloop_heartbeat import HeartbeatSettings
-from alphaloop_logging import LoggingConfig
-from alphaloop_storage import DatabaseConfig
+from infrastructure.alphaloop_cache import CacheConfig
+from infrastructure.alphaloop_heartbeat import HeartbeatSettings
+from infrastructure.alphaloop_logging import LoggingConfig
+from infrastructure.alphaloop_storage import DatabaseConfig
 
 # Note: alphaloop-security doesn't have a config class, it uses direct initialization
 

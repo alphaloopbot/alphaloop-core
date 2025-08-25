@@ -37,12 +37,6 @@ class PubSubError(CacheError):
     pass
 
 
-class PriceCacheError(CacheError):
-    """Raised when price cache operations fail."""
-
-    pass
-
-
 class ConfigurationError(CacheError):
     """Raised when cache configuration is invalid."""
 

@@ -83,7 +83,7 @@ class DictionaryIntegrityValidator:
         try:
             return json.loads(data["payload"])
         except json.JSONDecodeError as e:
-            raise IntegrityError(f"Failed to parse payload JSON: {str(e)}")
+            raise IntegrityError(f"Failed to parse payload JSON: {str(e)}") from e
 
     def verify_and_validate(
         self, data: dict[str, str], required_keys: list[str] | None = None

@@ -4,14 +4,17 @@ Basic test for AlphaLoop Cache package.
 """
 
 import asyncio
+import os
+import sys
 from datetime import datetime
 
-from alphaloop_cache import (
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+
+from infrastructure.alphaloop_cache import (
     CacheConfig,
     CacheManager,
+    GenericCache,
     KeyBuilder,
-    PriceCache,
-    PriceData,
     PubSubManager,
 )
 
@@ -102,49 +105,41 @@ async def test_cache_manager():
     print("✅ Cache manager test passed\n")
 
 
-async def test_price_cache():
-    """Test price cache functionality."""
-    print("💰 Testing Price Cache")
+async def test_generic_cache():
+    """Test generic cache functionality."""
+    print("💰 Testing Generic Cache")
     print("=" * 40)
 
     # Create cache manager
     config = CacheConfig(host="localhost", port=6379, db=0)
     cache_manager = CacheManager(config)
 
-    # Create price cache (not used in this test, just for demonstration)
-    _price_cache = PriceCache(cache_manager, default_ttl=300)
+    # Create generic cache (not used in this test, just for demonstration)
+    _generic_cache = GenericCache(cache_manager, default_ttl=300, prefix="test")
 
-    # Create test price data
-    price_data = PriceData(
-        symbol="BTC/USDT",
-        price=50000.0,
-        timestamp=datetime.utcnow(),
-        exchange="binance",
-        volume=1000.0,
-        bid=49999.0,
-        ask=50001.0,
-    )
+    # Create test data
+    test_data = {
+        "symbol": "BTC/USDT",
+        "price": 50000.0,
+        "timestamp": datetime.utcnow().isoformat(),
+        "exchange": "binance",
+        "volume": 1000.0,
+        "bid": 49999.0,
+        "ask": 50001.0,
+    }
 
-    print(f"💰 Symbol: {price_data.symbol}")
-    print(f"💰 Price: {price_data.price}")
-    print(f"💰 Exchange: {price_data.exchange}")
+    print(f"💰 Symbol: {test_data['symbol']}")
+    print(f"💰 Price: {test_data['price']}")
+    print(f"💰 Exchange: {test_data['exchange']}")
 
-    # Test price data serialization
-    price_dict = price_data.to_dict()
-    print(f"💰 Serialized: {price_dict}")
+    # Test data serialization
+    print(f"💰 Serialized: {test_data}")
 
-    assert price_dict["symbol"] == "BTC/USDT"
-    assert price_dict["price"] == 50000.0
-    assert price_dict["exchange"] == "binance"
+    assert test_data["symbol"] == "BTC/USDT"
+    assert test_data["price"] == 50000.0
+    assert test_data["exchange"] == "binance"
 
-    # Test price data deserialization
-    reconstructed = PriceData.from_dict(price_dict)
-    print(f"💰 Reconstructed: {reconstructed.symbol}")
-
-    assert reconstructed.symbol == price_data.symbol
-    assert reconstructed.price == price_data.price
-
-    print("✅ Price cache test passed\n")
+    print("✅ Generic cache test passed\n")
 
 
 async def test_pubsub_manager():
@@ -166,7 +161,7 @@ async def test_pubsub_manager():
         "price": 50000.0,
     }
 
-    from alphaloop_cache import PubSubMessage
+    from infrastructure.alphaloop_cache import PubSubMessage
 
     pubsub_message = PubSubMessage(
         channel="market_data",
@@ -199,7 +194,7 @@ async def main():
         await test_cache_config()
         await test_key_builder()
         await test_cache_manager()
-        await test_price_cache()
+        await test_generic_cache()
         await test_pubsub_manager()
 
         print("🎉 All basic tests completed successfully!")

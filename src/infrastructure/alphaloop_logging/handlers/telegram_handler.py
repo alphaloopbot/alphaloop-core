@@ -123,7 +123,7 @@ class TelegramHandler(BaseHandler):
                     response_text = await response.text()
                     raise TelegramError(f"Telegram API error {response.status}: {response_text}")
         except aiohttp.ClientError as e:
-            raise TelegramError(f"Failed to send Telegram message: {str(e)}")
+            raise TelegramError(f"Failed to send Telegram message: {str(e)}") from e
 
     async def close(self) -> None:
         """Close the Telegram handler."""
