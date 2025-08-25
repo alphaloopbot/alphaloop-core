@@ -9,7 +9,7 @@ from typing import Any
 from pydantic import BaseModel
 
 from infrastructure.alphaloop_cache.exceptions import PubSubError
-from infrastructure.alphaloop_cache.utils.key_builder import KeyBuilder
+from infrastructure.alphaloop_cache.utils import KeyBuilder
 
 from .connection import CacheManager
 

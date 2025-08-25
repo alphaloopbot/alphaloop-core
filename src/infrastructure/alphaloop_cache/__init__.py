@@ -11,7 +11,7 @@ from .core.connection import CacheConfig, CacheManager, create_cache_manager
 from .core.generic_cache import GenericCache
 from .core.pubsub import PubSubManager, PubSubMessage
 from .models.cache_entry import CacheEntry
-from .utils.key_builder import KeyBuilder
+from .utils import KeyBuilder
 
 __all__ = [
     "CacheConfig",

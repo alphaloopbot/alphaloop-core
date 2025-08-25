@@ -145,6 +145,50 @@ export-pr-comments: ## Export GitHub PR comments to JSON (requires PR=<number>)
 	@echo "✅ Comments exported to scripts/github-pr-tools/output/pr_$(PR)_comments.json"
 	@echo "💡 You can now feed this JSON to an LLM for analysis"
 
+export-pr-unresolved: ## Export unresolved review threads (requires PR=<number>)
+	@if [ -z "$(PR)" ]; then \
+		echo "Error: PR number required. Usage: make export-pr-unresolved PR=123"; \
+		exit 1; \
+	fi
+	@echo "Exporting unresolved threads for PR #$(PR)..."
+	@chmod +x scripts/github-pr-tools/export_unresolved_threads.sh
+	@cd scripts/github-pr-tools && ./export_unresolved_threads.sh $(PR)
+	@echo "✅ Unresolved threads exported to scripts/github-pr-tools/output/pr_$(PR)_unresolved_threads.txt"
+	@echo "💡 Review the unresolved threads to address pending feedback"
+
+export-pr-unresolved-resolve: ## Export and resolve outdated threads (requires PR=<number>)
+	@if [ -z "$(PR)" ]; then \
+		echo "Error: PR number required. Usage: make export-pr-unresolved-resolve PR=123"; \
+		exit 1; \
+	fi
+	@echo "Exporting and resolving outdated threads for PR #$(PR)..."
+	@chmod +x scripts/github-pr-tools/export_unresolved_threads.sh
+	@cd scripts/github-pr-tools && ./export_unresolved_threads.sh $(PR) --resolve-outdated --dry-run=false
+	@echo "✅ Unresolved threads exported and outdated threads resolved"
+	@echo "💡 Check scripts/github-pr-tools/output/pr_$(PR)_unresolved_threads.txt for remaining threads"
+
+export-pr-unresolved-markdown: ## Export unresolved threads with full content to Markdown (requires PR=<number>)
+	@if [ -z "$(PR)" ]; then \
+		echo "Error: PR number required. Usage: make export-pr-unresolved-markdown PR=123"; \
+		exit 1; \
+	fi
+	@echo "Exporting unresolved threads with full content to Markdown for PR #$(PR)..."
+	@chmod +x scripts/github-pr-tools/export_unresolved_threads_markdown.sh
+	@cd scripts/github-pr-tools && ./export_unresolved_threads_markdown.sh $(PR)
+	@echo "✅ Unresolved threads exported to Markdown"
+	@echo "💡 Check scripts/github-pr-tools/output/pr_$(PR)_unresolved_threads.md for detailed review"
+
+export-pr-current-checklist: ## Generate tickable checklist of current unresolved threads (requires PR=<number>)
+	@if [ -z "$(PR)" ]; then \
+		echo "Error: PR number required. Usage: make export-pr-current-checklist PR=123"; \
+		exit 1; \
+	fi
+	@echo "Generating current-only checklist for PR #$(PR)..."
+	@chmod +x scripts/github-pr-tools/make_current_checklist.sh
+	@cd scripts/github-pr-tools && ./make_current_checklist.sh $(PR)
+	@echo "✅ Current checklist generated"
+	@echo "💡 Check scripts/github-pr-tools/output/pr_$(PR)_current_checklist.md for tickable list"
+
 analyze-pr-comments: ## Analyze PR comments and generate LLM prompt (requires PR=<number>)
 	@if [ -z "$(PR)" ]; then \
 		echo "Error: PR number required. Usage: make analyze-pr-comments PR=123"; \

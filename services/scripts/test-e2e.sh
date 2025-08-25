@@ -163,13 +163,31 @@ test_data_flow() {
 # Performance Tests
 test_response_times() {
     # Test API response times
-    local start_time=$(date +%s.%N)
-    curl -f http://localhost:8001/health > /dev/null
-    local end_time=$(date +%s.%N)
-    local response_time=$(echo "$end_time - $start_time" | bc)
+    local start_time
+    start_time="$(date +%s.%N)"
+    curl -fsS http://localhost:8001/health > /dev/null
+    local end_time
+    end_time="$(date +%s.%N)"
+    local response_time
+    if command -v bc >/dev/null 2>&1; then
+        response_time="$(echo "$end_time - $start_time" | bc)"
+    else
+        response_time="$(python - <<'PY'
+import sys,decimal
+from decimal import Decimal
+start=Decimal(sys.argv[1]); end=Decimal(sys.argv[2])
+decimal.getcontext().prec=9
+print(end-start)
+PY
+"$start_time" "$end_time")"
+    fi
 
     # Response time should be less than 2 seconds
-    if (( $(echo "$response_time < 2" | bc -l) )); then
+    if python - <<'PY' "$response_time"; then
+import sys
+print(float(sys.argv[1]) < 2.0)
+PY
+    then
         echo "Response time: ${response_time}s (OK)"
         return 0
     else

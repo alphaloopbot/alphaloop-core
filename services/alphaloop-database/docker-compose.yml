@@ -1,7 +1,7 @@
 services:
   alphaloop-database:
     env_file:
-      - .env
+      - ../.env
     volumes:
       - ${ALPHALOOP_HOME}/postgres_db/:/var/lib/postgresql/data/
       - ./init-database.sh:/docker-entrypoint-initdb.d/init-database.sh

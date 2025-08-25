@@ -57,16 +57,19 @@ def settings() -> MappingProxyType[str, str]:
             f"{os.getenv('DB_PORT', '5432')}/{os.getenv('DB_NAME', 'alphaloop')}",
         ),
         # Default currency for market data and trading operations
-        "DEFAULT_CURRENCY": os.getenv("DEFAULT_CURRENCY", "USDT"),
+        "DEFAULT_CURRENCY": os.getenv("DEFAULT_CURRENCY", "USDT").strip().upper(),
     }
     return MappingProxyType(cfg)
 
 
 def get_default_currency() -> Currency:
     """Get the default currency from configuration."""
-    currency_str = settings()["DEFAULT_CURRENCY"]
+    currency_str = settings()["DEFAULT_CURRENCY"].strip().upper()
     try:
         return Currency(currency_str)
     except ValueError:
         # Fallback to USDT if invalid currency is configured
+        import logging
+
+        logging.warning(f"Invalid currency code '{currency_str}', falling back to USDT")
         return Currency.USDT
