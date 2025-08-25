@@ -1,6 +1,6 @@
 """System metadata entity for hardware and configuration information."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 from uuid import UUID
 
@@ -122,6 +122,20 @@ class SystemMetadata(Entity):
             "swap_total": self._swap_total,
             "ssd_total": self._ssd_total,
         }
+
+    def validate(self) -> bool:
+        """Validate core invariants."""
+        if self._cpu_cores <= 0 or self._cpu_cores_logical <= 0:
+            return False
+        if self._cpu_cores_logical < self._cpu_cores:
+            return False
+        if any(v < 0 for v in (self._ram_total, self._swap_total, self._ssd_total)):
+            return False
+        if self._boot_time > datetime.now(timezone.utc):
+            return False
+        if self._app_start_time < self._boot_time:
+            return False
+        return True
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "SystemMetadata":
