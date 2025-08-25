@@ -36,8 +36,9 @@ from alphaloop_heartbeat import HeartbeatGenerator, HeartbeatChecker
 from alphaloop_heartbeat import HeartbeatGenerator, HeartbeatChecker
 
 # Generate heartbeats
+import asyncio
 heartbeat_gen = HeartbeatGenerator("my-service")
-heartbeat_gen.generate_heartbeat()
+asyncio.run(heartbeat_gen.generate_heartbeat())
 
 # Check health
 checker = HeartbeatChecker("my-service")
@@ -58,7 +59,7 @@ class SystemMetricsService:
 
     def collect_metrics(self):
         # Generate heartbeat before collecting
-        self.heartbeat_generator.generate_heartbeat()
+        asyncio.run(self.heartbeat_generator.generate_heartbeat())
 
         # ... metrics collection logic
         print("Metrics collected")

@@ -82,7 +82,7 @@ class MarketData(Entity):
             currency = Currency(data["currency"])
 
         return cls(
-            metadata_id=data["metadata_id"],
+            metadata_id=int(data["metadata_id"]),
             timestamp_id=data["timestamp_id"],
             price=data["price"],
             quote_volume24h=data["quote_volume24h"],
