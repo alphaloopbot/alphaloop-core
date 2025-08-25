@@ -14,6 +14,7 @@ if ! command -v conda &> /dev/null; then
     exit 1
 fi
 
+RECREATE=0
 # Check if environment already exists
 if conda env list | grep -q "alphaloop-core"; then
     echo "⚠️  Environment 'alphaloop-core' already exists"
@@ -22,14 +23,20 @@ if conda env list | grep -q "alphaloop-core"; then
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo "🗑️  Removing existing environment..."
         conda env remove -n alphaloop-core
+        RECREATE=1
     else
-        echo "✅ Using existing environment"
+        echo "✅ Reusing existing environment (will update from environment.yml)"
     fi
 fi
 
-# Create environment from yml file
-echo "📦 Creating conda environment from environment.yml..."
-conda env create -f environment.yml
+# Create or update environment from yml file
+if [[ $RECREATE -eq 1 ]] || ! conda env list | grep -q "alphaloop-core"; then
+    echo "📦 Creating conda environment from environment.yml..."
+    conda env create -f environment.yml
+else
+    echo "🔄 Updating conda environment from environment.yml..."
+    conda env update -n alphaloop-core -f environment.yml --prune
+fi
 
 # Activate environment
 echo "🔧 Activating environment..."

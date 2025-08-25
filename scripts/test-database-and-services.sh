@@ -39,8 +39,8 @@ echo "Testing service data storage..."
 
 # Test System Metrics Service
 echo "Testing System Metrics Service Storage"
-docker run --rm --network host \
-    -e DB_HOST=host.docker.internal \
+if docker run --rm --add-host=host.docker.internal:host-gateway \
+    -e DB_HOST="${DB_HOST}" \
     -e DB_PORT="$DB_PORT" \
     -e DB_USER="$DB_USER" \
     -e DB_PASSWORD="$DB_PASSWORD" \
@@ -69,9 +69,7 @@ try:
 except Exception as e:
     print(f'❌ System metrics test error: {e}')
     sys.exit(1)
-"
-
-if [ $? -eq 0 ]; then
+"; then
     echo "✅ System metrics storage test passed"
 else
     echo "❌ System metrics storage test failed"
