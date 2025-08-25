@@ -127,11 +127,11 @@ make services-test-e2e
 
 ## 📚 Module Documentation
 
-- [alphaloop-heartbeat](./alphaloop_heartbeat/README.md) - Health monitoring
-- [alphaloop-logging](./alphaloop_logging/README.md) - Logging system
-- [alphaloop-security](./alphaloop_security/README.md) - Security utilities
-- [alphaloop-storage](./alphaloop_storage/README.md) - Database management
-- [alphaloop-cache](./alphaloop_cache/README.md) - Caching system
+- [alphaloop_heartbeat](./alphaloop_heartbeat/README.md) - Health monitoring
+- [alphaloop_logging](./alphaloop_logging/README.md) - Logging system
+- [alphaloop_security](./alphaloop_security/README.md) - Security utilities
+- [alphaloop_storage](./alphaloop_storage/README.md) - Database management
+- [alphaloop_cache](./alphaloop_cache/README.md) - Caching system
 
 ## 🎯 Key Points
 
