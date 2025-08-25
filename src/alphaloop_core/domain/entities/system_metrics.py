@@ -50,7 +50,13 @@ class SystemMetrics(Entity):
         """Basic validation for metric ranges and presence."""
         try:
             # Percentages must be within [0, 100]
-            for v in (self._cpu_usage, self._core_usage_max, self._core_usage_min, self._ram_usage):
+            for v in (
+                self._cpu_usage,
+                self._core_usage_max,
+                self._core_usage_min,
+                self._ram_usage,
+                self._ssd_usage,
+            ):
                 if not (0.0 <= v <= 100.0):
                     return False
             # Per-core usages must also be [0, 100]
@@ -58,6 +64,9 @@ class SystemMetrics(Entity):
                 return False
             # Logical invariant: min must not exceed max
             if self._core_usage_min > self._core_usage_max:
+                return False
+            # Optional swap usage validation
+            if self._swap_usage is not None and not (0.0 <= self._swap_usage <= 100.0):
                 return False
         except Exception:
             return False

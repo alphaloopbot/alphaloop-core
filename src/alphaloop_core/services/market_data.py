@@ -107,23 +107,24 @@ class MarketDataService:
                 metadata_id = await self.metadata_handler.insert_data(metadata)
                 if metadata_id is not None:
                     if isinstance(metadata_id, list):
-                        metadata_ids[pair["symbol"]] = metadata_id[0] if metadata_id else 1
+                        if metadata_id:
+                            metadata_ids[pair["symbol"]] = metadata_id[0]
+                        else:
+                            raise ValueError(
+                                f"Failed to insert metadata for {pair['symbol']}: empty result"
+                            )
                     else:
                         metadata_ids[pair["symbol"]] = metadata_id
                 else:
-                    metadata_ids[pair["symbol"]] = 1
+                    raise ValueError(
+                        f"Failed to insert metadata for {pair['symbol']}: no ID returned"
+                    )
 
             return metadata_ids
 
         except Exception as e:
             self.logger.error_sync(f"Error creating metadata: {e}")
-            # Return default metadata IDs for now
-            return {
-                "BTC/USDT": 1,
-                "ETH/USDT": 2,
-                "ADA/USDT": 3,
-                "DOT/USDT": 4,
-            }
+            raise RuntimeError(f"Failed to create metadata: {e}") from e
 
     async def get_mock_market_data(self) -> list[dict[str, Any]]:
         """Generate mock market data for testing."""
@@ -195,9 +196,10 @@ class MarketDataService:
                 for data in market_data:
                     # Get symbol from metadata_id for caching
                     symbol = None
-                    if self.metadata_ids:
+                    metadata_id = data.get("metadata_id")
+                    if self.metadata_ids and metadata_id is not None:
                         for sym, mid in self.metadata_ids.items():
-                            if mid == data.get("metadata_id"):
+                            if mid == metadata_id:
                                 symbol = sym
                                 break
                     if symbol:

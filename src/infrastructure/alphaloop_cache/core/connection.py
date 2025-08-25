@@ -19,13 +19,26 @@ Key Features:
 """
 
 from dataclasses import dataclass
+from decimal import Decimal
 import json
 from typing import Any
 
 import redis.asyncio as redis
 from redis.asyncio import Redis
 
-from infrastructure.alphaloop_cache.exceptions import CacheConnectionError, CacheOperationError
+from infrastructure.alphaloop_cache.exceptions import (
+    CacheConnectionError,
+    CacheOperationError,
+)
+
+
+class DecimalEncoder(json.JSONEncoder):
+    """Custom JSON encoder to handle Decimal objects."""
+
+    def default(self, obj: Any) -> Any:
+        if isinstance(obj, Decimal):
+            return float(obj)
+        return super().default(obj)
 
 
 @dataclass
@@ -216,7 +229,7 @@ class CacheManager:
         """Set key with optional TTL."""
         try:
             if isinstance(value, (dict, list)):
-                value = json.dumps(value)
+                value = json.dumps(value, cls=DecimalEncoder)
             await self.redis_client.set(key, value, ex=ttl)
             return True
         except Exception as e:

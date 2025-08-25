@@ -163,11 +163,11 @@ class SystemMetricsService:
             if cpu_temperature is not None:
                 metrics["cpu_temperature"] = cpu_temperature
 
-            if cpu_speed is not None:
-                metrics["cpu_speed"] = int(cpu_speed)
-
+            # Set CPU speed - prefer psutil over file reading
             if cpu_freq and cpu_freq.current:
                 metrics["cpu_speed"] = int(cpu_freq.current)  # Already in MHz
+            elif cpu_speed is not None:
+                metrics["cpu_speed"] = int(cpu_speed)
 
             # Add per-core usage if available
             if cpu_per_core:
